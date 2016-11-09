@@ -20,3 +20,24 @@
 ;; https://www.4clojure.com/problem/83
 (fn [& args]
   (and (boolean (some true? args)) (not-every? true? args)))
+
+;; Map Construction
+;; https://www.4clojure.com/problem/61
+(def map-construction
+ (fn [a b]
+   (apply assoc {} (interleave a b))))
+
+;; Set Intersection
+;; https://www.4clojure.com/problem/81
+(def set-intersection
+  (fn [a b]
+    (set (filter a b))))
+
+;; Comparisons
+;; https://www.4clojure.com/problem/166
+(def comparisons
+  (fn [op a b]
+    (cond
+      (op a b) :lt
+      (op b a) :gt
+      :else :eq)))
