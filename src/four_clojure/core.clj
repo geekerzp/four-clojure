@@ -11,3 +11,12 @@
   [(take n coll) (drop n coll)])
 
 (juxt take drop)
+
+;; Advanced Destructuring
+;; https://www.4clojure.com/problem/51
+[1 2 3 4 5]
+
+;; A Half-Truth
+;; https://www.4clojure.com/problem/83
+(fn [& args]
+  (and (boolean (some true? args)) (not-every? true? args)))
