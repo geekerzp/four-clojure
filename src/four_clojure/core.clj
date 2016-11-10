@@ -41,3 +41,17 @@
       (op a b) :lt
       (op b a) :gt
       :else :eq)))
+
+;; Re-implement Iterate
+;; http://www.4clojure.com/problem/62
+(def re-implement-iterate
+  (fn it [f x]
+    (cons x (lazy-seq (it f (f x))))))
+
+;; Re-implement Map
+;; http://www.4clojure.com/problem/118
+(def re-implement-map
+  (fn mp [f s]
+    (if (empty? s)
+      nil
+      (cons (f (first s)) (mp f (rest s))))))
