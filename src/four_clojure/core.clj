@@ -54,4 +54,4 @@
   (fn mp [f s]
     (if (empty? s)
       nil
-      (cons (f (first s)) (mp f (rest s))))))
+      (lazy-seq (cons (f (first s)) (mp f (rest s)))))))
