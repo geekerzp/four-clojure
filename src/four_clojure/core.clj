@@ -55,3 +55,10 @@
     (if (empty? s)
       nil
       (lazy-seq (cons (f (first s)) (mp f (rest s)))))))
+
+;; Simple closures
+;; http://www.4clojure.com/problem/107
+(def simple-closures
+  (fn [n]
+    (fn [x]
+      (int (Math/pow x n)))))
