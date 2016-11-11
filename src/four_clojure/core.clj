@@ -62,3 +62,11 @@
   (fn [n]
     (fn [x]
       (int (Math/pow x n)))))
+
+;; Greatest Common Divisor
+;; http://www.4clojure.com/problem/66
+(def greatest-common-divisor
+  (fn euclid [a b]
+    (if (= b 0)
+      a
+      (recur b (mod a b)))))
