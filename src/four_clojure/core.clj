@@ -70,3 +70,12 @@
     (if (= b 0)
       a
       (recur b (mod a b)))))
+
+;; Product Digits
+;; http://www.4clojure.com/problem/99
+(def product-digits
+ (fn [a b]
+   (->> (* a b)
+        str
+        (map str)
+        (map #(Integer/parseInt %)))))
