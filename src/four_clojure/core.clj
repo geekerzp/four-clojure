@@ -83,3 +83,67 @@
         str
         (map str)
         (map #(Integer/parseInt %)))))
+
+;; Cartesian Product
+;; http://www.4clojure.com/problem/90
+(def cartesian-product
+ (fn [s1 s2]
+   (into #{} (for [s1 s1
+                   s2 s2]
+               [s1 s2])))
+  )
+
+;; Group a Sequence
+;; http://www.4clojure.com/problem/63
+(def group-a-sequence
+ (fn [f s]
+   (apply merge-with concat (map #(hash-map (f %) [%]) s)))
+  )
+
+;; Symmetic Difference
+;; http://www.4clojure.com/problem/63
+(def symmetic-difference
+  (fn [a b]
+    (clojure.set/union (clojure.set/difference a b) (clojure.set/difference b a)))
+  )
+
+;; dot product
+;; http://www.4clojure.com/problem/143
+(def dot-product
+  #(reduce + (map * %1 %2))
+  )
+
+;; Read a binary number
+;; http://www.4clojure.com/problem/122
+(def read-a-binary-number
+  #(Integer/valueOf % 2)
+  )
+
+;; Through the Looking Class
+;; http://www.4clojure.com/problem/126
+Class
+
+;; Infix Calculator
+;; http://www.4clojure.com/problem/135
+(def infix-calculator
+  (fn [& expr]
+    (loop [[x & xs] expr acc 0 op +]
+      (cond
+        (nil? x) acc
+        (number? x) (recur xs (op acc x) nil)
+        :else (recur xs acc x))))
+  )
+
+;; Indexing Sequences
+;; http://www.4clojure.com/problem/157
+(def indexing-sequences
+  ;; #(map vector % (range))
+  #(map-indexed vector %)
+  )
+
+;; Pascal's Triangle
+;; http://www.4clojure.com/problem/97
+(def pascal-triangle
+  (fn [n]
+    (nth (iterate #(map + (concat [0] %) (concat % [0])) [1]) (dec n)))
+  )
