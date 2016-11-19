@@ -174,3 +174,17 @@ Class
       (count (filter (fn [[k v]] (< k v))
                      (zipmap s (map (comp sum-of-sequare digitize) s))))))
   )
+
+;; Least Common Multiple
+;; http://www.4clojure.com/problem/100
+(def least-common-multiple
+  (fn lcm
+    ([x y]
+     (letfn [(gcd [a b]
+               (cond
+                 (zero? b) a
+                 (> a b) (gcd b (mod a b))
+                 :else (gcd a (mod b a))))]
+       (/ (* x y) (gcd x y))))
+    ([x y & rest] (apply lcm (lcm x y) rest)))
+  )
