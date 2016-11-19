@@ -147,3 +147,30 @@ Class
   (fn [n]
     (nth (iterate #(map + (concat [0] %) (concat % [0])) [1]) (dec n)))
   )
+
+;; To Tree, or not to Tree
+;; http://www.4clojure.com/problem/95
+(def to-tree-or-not-to-tree
+  (fn [r]
+    (every?
+     #(or
+       (nil? %)
+       (and (sequential? %) (= 3 (count %))))
+     (tree-seq sequential? rest r)))
+  )
+
+;; Sum of square of digits
+;; http://www.4clojure.com/problem/120
+(def sum-of-sequare-of-digits
+  (fn [s]
+    (letfn [(digitize [n]
+              (loop [n n
+                     ret ()]
+                (if (< n 1)
+                  ret
+                  (recur (quot n 10) (conj ret (rem n 10))))))
+            (sum-of-sequare [s]
+              (reduce + (map #(* % %) s)))]
+      (count (filter (fn [[k v]] (< k v))
+                     (zipmap s (map (comp sum-of-sequare digitize) s))))))
+  )
