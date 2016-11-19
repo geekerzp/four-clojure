@@ -195,3 +195,16 @@ Class
   (fn [s]
     (iterate #(map + (concat [0N] %) (concat % [0N])) s))
   )
+
+;; Beauty is Symmetry
+;; http://www.4clojure.com/problem/96
+(def beauty-is-symmetry
+  (fn [[_ l r]]
+    (letfn [(mirror?
+              [[lx ll lr :as l] [rx rl rr :as r]]
+              (or (not (or l r))
+                  (and (= lx rx)
+                       (and (mirror? ll rr)
+                            (mirror? lr rl)))))]
+      (mirror? l r)))
+  )
