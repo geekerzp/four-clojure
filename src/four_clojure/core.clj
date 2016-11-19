@@ -188,3 +188,10 @@ Class
        (/ (* x y) (gcd x y))))
     ([x y & rest] (apply lcm (lcm x y) rest)))
   )
+
+;; Pascal's Trapezoid
+;; http://www.4clojure.com/problem/147
+(def passcal-trapzoid
+  (fn [s]
+    (iterate #(map + (concat [0N] %) (concat % [0N])) s))
+  )
