@@ -233,3 +233,9 @@ Class
                    [vk vv] v]
                [[k vk] vv])))
   )
+
+;; Pairwise Disjoint Sets
+;; http://www.4clojure.com/problem/153
+(def parwise-disjoint-sets
+  #(apply distinct? (mapcat seq %))
+  )
