@@ -208,3 +208,28 @@ Class
                             (mirror? lr rl)))))]
       (mirror? l r)))
   )
+
+;; Recognize Playing Cards
+;; http://www.4clojure.com/problem/128
+(def recegnize-playing-cards
+  (fn [s]
+    (let [suit {\H :heart, \C :club, \D :diamond, \S :spades}
+          rank {\2 0, \3 1, \4 2, \5 3, \6 4, \7 5,
+                \8 6, \9 7, \T 8, \J 9, \Q 10, \K 11, \A 12}]
+      {:suit (suit (first s)), :rank (rank (second s))}))
+  )
+
+;; Split by Type
+;; http://www.4clojure.com/problem/50
+(def split-by-type
+  #(vals (group-by type %))
+  )
+
+;; Trees into tables
+;; http://www.4clojure.com/problem/146
+(def trees-into-tables
+  (fn [t]
+    (into {} (for [[k v] t
+                   [vk vv] v]
+               [[k vk] vv])))
+  )
