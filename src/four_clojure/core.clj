@@ -255,3 +255,11 @@ Class
     (let [part (split-at (mod n (count coll)) coll)]
       (concat (second part) (first part))))
   )
+
+;; Count Occurrences
+;; http://www.4clojure.com/problem/55
+(def count-occurrences
+  #(into {}
+         (map (fn [[k v]] [k (count v)])
+              (group-by identity %)))
+  )
