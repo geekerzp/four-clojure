@@ -270,3 +270,11 @@ Class
   (fn [coll n]
     (apply map list (partition n n coll)))
   )
+
+;; Function Composition
+;; http://www.4clojure.com/problem/58
+(def function-composition
+  (fn [& fs]
+    (reduce (fn [f g]
+              #(f (apply g %&))) fs))
+  )
