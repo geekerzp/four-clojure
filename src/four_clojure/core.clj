@@ -278,3 +278,13 @@ Class
     (reduce (fn [f g]
               #(f (apply g %&))) fs))
   )
+
+;; Find Distinct Items
+;; http://www.4clojure.com/problem/56
+(def find-distinct-items
+  #(reduce (fn [acc n]
+             (if (some #{n} acc)
+               acc
+               (conj acc n)))
+           [] %)
+  )
