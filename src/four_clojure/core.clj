@@ -263,3 +263,10 @@ Class
          (map (fn [[k v]] [k (count v)])
               (group-by identity %)))
   )
+
+;; Reverse Interleave
+;; http://www.4clojure.com/problem/43
+(def reverse-interleave
+  (fn [coll n]
+    (apply map list (partition n n coll)))
+  )
