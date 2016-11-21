@@ -247,3 +247,11 @@ Class
     (fn [& args]
       (apply f (reverse args))))
   )
+
+;; Rotate Sequence
+;; http://www.4clojure.com/problem/44
+(def rotate-sequence
+  (fn [n coll]
+    (let [part (split-at (mod n (count coll)) coll)]
+      (concat (second part) (first part))))
+  )
