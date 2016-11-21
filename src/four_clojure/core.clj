@@ -288,3 +288,14 @@ Class
                (conj acc n)))
            [] %)
   )
+
+;; Partition a Sequence
+;; http://www.4clojure.com/problem/54
+(def partition-sequence
+  (fn [n s]
+    (loop [m 0
+           ret '()]
+      (if (> (+ m n) (count s))
+        (reverse ret)
+        (recur (+ n m) (conj ret (take n (drop m s)))))))
+  )
