@@ -239,3 +239,11 @@ Class
 (def parwise-disjoint-sets
   #(apply distinct? (mapcat seq %))
   )
+
+;; Flipping out
+;; http://www.4clojure.com/problem/46
+(def flipping-out
+  (fn [f]
+    (fn [& args]
+      (apply f (reverse args))))
+  )
