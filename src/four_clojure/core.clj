@@ -299,3 +299,11 @@ Class
         (reverse ret)
         (recur (+ n m) (conj ret (take n (drop m s)))))))
   )
+
+;; Word Sorting
+;; http://www.4clojure.com/problem/70
+(def word-sorting
+  (fn [s]
+    (let [words (re-seq #"\w+" s)]
+      (sort-by clojure.string/lower-case words)))
+  )
