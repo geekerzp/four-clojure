@@ -307,3 +307,11 @@ Class
     (let [words (re-seq #"\w+" s)]
       (sort-by clojure.string/lower-case words)))
   )
+
+;; Juxtaposition
+;; http://www.4clojure.com/problem/59
+(def juxtaposition
+  (fn [& fs]
+    (fn [& args]
+      (reduce #(conj %1 (apply %2 args)) [] fs)))
+  )
