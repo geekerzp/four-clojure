@@ -315,3 +315,15 @@ Class
     (fn [& args]
       (reduce #(conj %1 (apply %2 args)) [] fs)))
   )
+
+;; Prime Numbers
+;; http://www.4clojure.com/problem/67
+(def prime-numbers
+  (fn [x]
+    (take x
+          (remove
+           (fn [n]
+             (some #(= 0 (mod n %))
+                   (range 2 (inc (int (Math/sqrt n))))))
+           (iterate inc 2))))
+  )
