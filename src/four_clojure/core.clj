@@ -327,3 +327,15 @@ Class
                    (range 2 (inc (int (Math/sqrt n))))))
            (iterate inc 2))))
   )
+
+;; Black Box Testing
+;; http://www.4clojure.com/problem/65
+(def black-box-testing
+  (fn [coll]
+    (let [base (empty coll)]
+      (cond
+        (= base {}) :map
+        (= base #{}) :set
+        (reversible? base) :vector
+        (= base '()) :list)))
+  )
