@@ -339,3 +339,15 @@ Class
         (reversible? base) :vector
         (= base '()) :list)))
   )
+
+;; Filter Perfect Squares
+;; http://www.4clojure.com/problem/74
+(def filter-perfect-squares
+  (fn [s]
+    (->> s
+         (#(clojure.string/split % #","))
+         (map read-string)
+         (filter #(== (Math/sqrt %) (int (Math/sqrt %))))
+         (clojure.string/join ","))
+    )
+  )
