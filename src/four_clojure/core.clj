@@ -351,3 +351,19 @@ Class
          (clojure.string/join ","))
     )
   )
+
+;; Perfect Numbers
+;; http://www.4clojure.com/problem/80
+(def perfect-numbers
+  (fn [n]
+    (= n (apply + (filter #(zero? (mod n %)) (range 1 n)))))
+  )
+
+;; intoCamelCase
+;; http://www.4clojure.com/problem/102
+(def into-camel-case
+  (fn [s]
+    (clojure.string/join
+     (let [words (clojure.string/split s #"-")]
+       (cons (first words) (map #(clojure.string/capitalize %) (rest words))))))
+  )
