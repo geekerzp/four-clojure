@@ -390,3 +390,23 @@ Class
         m1 m2))
      (first maps) (rest maps)))
   )
+
+;; Happy numbers
+;; http://www.4clojure.com/problem/86
+(def happy-numbers
+  (fn [n]
+    (letfn [(digitize [n]
+              (loop [n n
+                     ret ()]
+                (if (< n 1)
+                  ret
+                  (recur (quot n 10) (conj ret (rem n 10))))))
+            (change [n]
+              (reduce + (map #(* % %) (digitize n))))]
+      (loop [n n
+             ret #{}]
+        (cond
+          (= 1 n) true
+          (ret n) false
+          :else (recur (change n) (conj ret n))))))
+  )
