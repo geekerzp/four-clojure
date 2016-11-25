@@ -377,3 +377,16 @@ Class
                (filter #(> (count %) 1)
                        (vals (group-by sort s))))))
   )
+
+;; Merge with a Function
+;; http://www.4clojure.com/problem/69
+(def merge-with-function
+  (fn [f & maps]
+    (reduce
+     (fn [m1 m2]
+       (reduce
+        (fn [m [k v]]
+          (assoc m k (if (m1 k) (f (m1 k) v) v)))
+        m1 m2))
+     (first maps) (rest maps)))
+  )
