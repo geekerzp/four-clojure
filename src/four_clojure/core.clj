@@ -367,3 +367,13 @@ Class
      (let [words (clojure.string/split s #"-")]
        (cons (first words) (map #(clojure.string/capitalize %) (rest words))))))
   )
+
+;; Anagram Finder
+;; http://www.4clojure.com/problem/77
+(def anagram-finder
+  (fn [s]
+    (into #{}
+          (map set
+               (filter #(> (count %) 1)
+                       (vals (group-by sort s))))))
+  )
