@@ -438,3 +438,16 @@ Class
 ;; http://www.4clojure.com/problem/76
 (def intro-to-trampoline
   [1 3 5 7 9 11])
+
+;; Longest Increasing Sub-Seq
+;; http://www.4clojure.com/problem/53
+(def longest-increasing-subseq
+  (fn [coll]
+   (->> (map vector coll (range))
+        (partition-by #(apply - %))
+        (map #(map first %))
+        (filter #(> (count %) 1))
+        (sort-by (comp - count))
+        first
+        vec))
+  )
