@@ -426,3 +426,10 @@ Class
             (when-let [s (seq coll)]
               (my-reductions f (f init (first s)) (rest s)))))))
   )
+
+;; Power Set
+;; http://www.4clojure.com/problem/85
+(def power-set
+  (fn [s]
+    (set (reduce #(concat %1 (map (fn [i] (set (conj i %2))) %1)) (list #{}) s)))
+  )
