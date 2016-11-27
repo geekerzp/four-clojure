@@ -433,3 +433,8 @@ Class
   (fn [s]
     (set (reduce #(concat %1 (map (fn [i] (set (conj i %2))) %1)) (list #{}) s)))
   )
+
+;; Intro to Trampoline
+;; http://www.4clojure.com/problem/76
+(def intro-to-trampoline
+  [1 3 5 7 9 11])
