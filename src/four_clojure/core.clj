@@ -476,3 +476,16 @@ Class
         (recur (second (split-with number? (rest s)))
                (assoc ret (first s) (first (split-with number? (rest s))))))))
   )
+
+;; Reimplement Trampoline
+;; http://www.4clojure.com/problem/78
+(def reimplement-trampoline
+  (fn my-trampoline
+    ([f]
+     (let [ret (f)]
+       (if (fn? ret)
+         (recur ret)
+         ret)))
+    ([f & args]
+     (my-trampoline #(apply f args))))
+  )
