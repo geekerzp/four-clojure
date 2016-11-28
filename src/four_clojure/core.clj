@@ -465,3 +465,14 @@ Class
                   :else (recur a (mod b a))))]
         (count (filter #{1} (map (partial gcd n) (range 1 n)))))))
   )
+
+;; Identify keys and values
+;; http://www.4clojure.com/problem/105
+(def identity-keys-and-values
+  (fn [s]
+    (loop [s s ret {}]
+      (if (empty? s)
+        ret
+        (recur (second (split-with number? (rest s)))
+               (assoc ret (first s) (first (split-with number? (rest s))))))))
+  )
