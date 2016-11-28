@@ -451,3 +451,17 @@ Class
         first
         vec))
   )
+
+;; Euler's Totient Function
+;; http://www.4clojure.com/problem/75
+(def totient-function
+  (fn [n]
+    (if (= n 1)
+      1
+      (letfn [(gcd [a b]
+                (cond
+                  (zero? b) a
+                  (> a b) (recur b (mod a b))
+                  :else (recur a (mod b a))))]
+        (count (filter #{1} (map (partial gcd n) (range 1 n)))))))
+  )
