@@ -505,3 +505,15 @@ Class
   (fn [f s]
     (set (map set (vals (group-by f s)))))
   )
+
+;; Digits and bases
+;; http://www.4clojure.com/problem/137
+(def digits-and-bases
+  (fn [n b]
+    (if (zero? n)
+      '(0)
+      (loop [n n ret '()]
+        (if (< n 1)
+          ret
+          (recur (quot n b) (conj ret (rem n b)))))))
+  )
