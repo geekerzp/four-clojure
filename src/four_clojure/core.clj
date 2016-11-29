@@ -517,3 +517,9 @@ Class
           ret
           (recur (quot n b) (conj ret (rem n b)))))))
   )
+
+;; Oscilrate
+;; http://www.4clojure.com/problem/144
+(def oscilrate
+  #(reductions (fn [v f] (f v)) %1 (cycle %&))
+  )
