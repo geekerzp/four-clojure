@@ -498,3 +498,10 @@ Class
       (= (reduce + (map int (take (Math/ceil (/ l 2)) s)))
          (reduce + (map int (drop (Math/floor (/ l 2)) s))))))
   )
+
+;; Equivalence Classes
+;; http://www.4clojure.com/problem/98
+(def equivalence-classes
+  (fn [f s]
+    (set (map set (vals (group-by f s)))))
+  )
