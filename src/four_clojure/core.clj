@@ -489,3 +489,12 @@ Class
     ([f & args]
      (my-trampoline #(apply f args))))
   )
+
+;; The Balance of N
+;; http://www.4clojure.com/problem/115
+(def balance-number
+  (fn [n]
+    (let [s (str n), l (count s)]
+      (= (reduce + (map int (take (Math/ceil (/ l 2)) s)))
+         (reduce + (map int (drop (Math/floor (/ l 2)) s))))))
+  )
