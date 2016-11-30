@@ -531,3 +531,13 @@ Class
     (fn [& args]
       (reduce #(%1 %2) f args)))
   )
+
+;; Lazy Searching
+;; http://www.4clojure.com/problem/108
+(def lazy-searching
+  (fn [& xs]
+    (if (apply = (map first xs))
+      (ffirst xs)
+      (let [smallest (apply min (map first xs))]
+        (recur (map #(if (= smallest (first %)) (drop 1 %) %) xs)))))
+  )
