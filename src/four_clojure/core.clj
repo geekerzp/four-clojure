@@ -541,3 +541,12 @@ Class
       (let [smallest (apply min (map first xs))]
         (recur (map #(if (= smallest (first %)) (drop 1 %) %) xs)))))
   )
+
+;; Partially Flatten a Sequence
+;; http://www.4clojure.com/problem/93
+(def partially-flatten-sequence
+  (fn [x]
+    (filter #(every? (complement sequential?) %)
+     (filter sequential?
+             (rest (tree-seq sequential? seq x)))))
+  )
