@@ -523,3 +523,11 @@ Class
 (def oscilrate
   #(reductions (fn [v f] (f v)) %1 (cycle %&))
   )
+
+;; Decurry
+;; http://www.4clojure.com/problem/158
+(def decurry
+  (fn [f]
+    (fn [& args]
+      (reduce #(%1 %2) f args)))
+  )
