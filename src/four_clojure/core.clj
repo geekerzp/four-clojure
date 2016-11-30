@@ -550,3 +550,24 @@ Class
      (filter sequential?
              (rest (tree-seq sequential? seq x)))))
   )
+
+;; Global take-while
+;; http://www.4clojure.com/problem/114
+(def global-take-while
+  (fn _ [n p [x & xs]]
+    (let [n (if (p x) (dec n) n)]
+      (if (zero? n)
+        '()
+        (lazy-seq (cons x (_ n p xs))))))
+  )
+
+;; Insert between two items
+;; http://www.4clojure.com/problem/132
+(def insert-between-two-items
+  (fn [pred val coll]
+    (->> (partition 2 1 coll)
+         (mapcat (fn [[x y]] (if (pred x y) [val y] [y])))
+         (cons (first coll))
+         (filter (complement nil?))
+         ))
+  )
