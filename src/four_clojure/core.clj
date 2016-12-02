@@ -571,3 +571,14 @@ Class
          (filter (complement nil?))
          ))
   )
+
+;; Sequence of pronunciations
+;; http://www.4clojure.com/problem/110
+(def sequence-of-pronunciations
+  (fn [s]
+    (rest
+     (iterate
+      #(flatten
+        (map (fn [v] (vector (count v) (first v)))
+             (partition-by identity %))) s)))
+  )
