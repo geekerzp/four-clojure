@@ -595,3 +595,12 @@ Class
          (let [[arabic roman] (last (filter #(>= n (first %)) rmap))]
            (recur (str s roman) (- n arabic)))))))
   )
+
+;; Generating k-combinations
+;; http://www.4clojure.com/problem/103
+(def generating-k-combinations
+  (fn [k s]
+    (set (filter #(= k (count %))
+                 (reduce #(concat %1 (map (fn [x] (set (conj x %2))) %1))
+                         #{#{}} s))))
+  )
