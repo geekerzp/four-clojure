@@ -582,3 +582,16 @@ Class
         (map (fn [v] (vector (count v) (first v)))
              (partition-by identity %))) s)))
   )
+
+;; Write Roman Numerals
+;; http://www.4clojure.com/problem/104
+(def write-roman-numberals
+  (fn [n]
+    (let [rmap (sorted-map 1000 "M" 900 "CM" 500 "D" 400 "CD" 100 "C"
+                           90 "XC" 50 "L" 40 "XL" 10 "X" 9 "IX" 5 "V" 4 "IV" 1 "I")]
+     (loop [s "" n n]
+       (if (zero? n)
+         s
+         (let [[arabic roman] (last (filter #(>= n (first %)) rmap))]
+           (recur (str s roman) (- n arabic)))))))
+  )
