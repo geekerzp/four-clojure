@@ -604,3 +604,12 @@ Class
                  (reduce #(concat %1 (map (fn [x] (set (conj x %2))) %1))
                          #{#{}} s))))
   )
+
+;; Intervals
+;; http://www.4clojure.com/problem/171
+(def intervals
+  (fn [c]
+    (->> (map list (sort (set c)) (range))
+         (partition-by #(apply - %))
+         (map #(list (ffirst %) (first (last %))))))
+  )
