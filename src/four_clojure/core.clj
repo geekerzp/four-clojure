@@ -617,16 +617,14 @@ Class
 ;; Sequs Horribilis
 ;; http://www.4clojure.com/problem/112
 (def sequs-horribilis
-  (fn _ [n coll]
-    (letfn [(cost [coll]
-              (if (sequential? coll)
-                (apply + (flatten coll))
-                coll))
-            (fit [n coll]
-              (if (sequential? coll)
-                (_ n coll)
-                (when (<= coll n) coll)))]
-      (let [allowances (reductions #(- % (cost %2)) n coll)
-            pruned (map fit allowances coll)]
-        (take-while #(or (number? %) (not (empty? %))) pruned))))
+  (fn [n coll]
+    (letfn [(sequs [cnt coll]
+              (loop [cnt cnt coll coll ret []]
+                (let [head (first coll)]
+                  (cond
+                    (nil? head) ret
+                    (coll? head) (conj ret (sequs cnt head))
+                    (> (+ cnt head) n) ret
+                    :else (recur (+ cnt head) (rest coll) (conj ret head))))))]
+      (sequs 0 coll)))
   )
