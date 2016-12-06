@@ -613,3 +613,20 @@ Class
          (partition-by #(apply - %))
          (map #(list (ffirst %) (first (last %))))))
   )
+
+;; Sequs Horribilis
+;; http://www.4clojure.com/problem/112
+(def sequs-horribilis
+  (fn _ [n coll]
+    (letfn [(cost [coll]
+              (if (sequential? coll)
+                (apply + (flatten coll))
+                coll))
+            (fit [n coll]
+              (if (sequential? coll)
+                (_ n coll)
+                (when (<= coll n) coll)))]
+      (let [allowances (reductions #(- % (cost %2)) n coll)
+            pruned (map fit allowances coll)]
+        (take-while #(or (number? %) (not (empty? %))) pruned))))
+  )
