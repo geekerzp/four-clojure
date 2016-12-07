@@ -661,8 +661,8 @@ Class
 ;; http://www.4clojure.com/problem/148
 (def big-divide
   (fn [n a b]
-    (let [e #(quot (- n 1N) %)
-          f #(* % (/ (* (e %) (inc (e %))) 2N))
+    (let [g #(quot (- n 1N) %)
+          f #(/ (* % (inc (g %)) (g %)) 2)
           x (f a)
           y (f b)
           z (f (* a b))]
