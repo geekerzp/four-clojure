@@ -645,3 +645,14 @@ Class
        (prime? n)
        (= n (/ (+ (pre-pri (dec n)) (next-pri (inc n))) 2)))))
   )
+
+;; Universal Computation Engine
+;; http://www.4clojure.com/problem/121
+(def universal-computation-engine
+  (fn [s]
+    (fn [m]
+      (letfn [(calc [[op & args]]
+                (apply ({'+ + '- - '* * '/ /} op)
+                       (map #(if (coll? %) (calc %) (m % %)) args)))]
+        (calc s))))
+  )
