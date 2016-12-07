@@ -624,3 +624,24 @@ Class
                   (cons s (_ (- n (reduce + (flatten s))) xs)))
       (<= x n) (cons x (_ (- n x) xs))
       :e '())))
+
+;; Prime Sandwich
+;; http://www.4clojure.com/problem/116
+(def prime-sandwich
+  (fn [n]
+    (letfn [(prime? [x]
+              (not-any? #(zero? (mod x %))
+                        (range 2 (inc (int (Math/sqrt x))))))
+            (pre-pri [x]
+              (if (prime? x)
+                x
+                (pre-pri (dec x))))
+            (next-pri [x]
+              (if (prime? x)
+                x
+                (next-pri (inc x))))]
+      (and
+       (> n 2)
+       (prime? n)
+       (= n (/ (+ (pre-pri (dec n)) (next-pri (inc n))) 2)))))
+  )
