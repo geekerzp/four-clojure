@@ -656,3 +656,15 @@ Class
                        (map #(if (coll? %) (calc %) (m % %)) args)))]
         (calc s))))
   )
+
+;; The Big Divide
+;; http://www.4clojure.com/problem/148
+(def big-divide
+  (fn [n a b]
+    (let [e #(quot (- n 1N) %)
+          f #(* % (/ (* (e %) (inc (e %))) 2N))
+          x (f a)
+          y (f b)
+          z (f (* a b))]
+      (- (+ x y) z)))
+  )
