@@ -3,14 +3,14 @@
 ;; Drop Every Nth Element
 ;; http://www.4clojure.com/problem/41
 (def drop-every-nth-element
- (fn [coll n]
-   (mapcat #(take (dec n) %) (partition-all n coll))))
+  (fn [coll n]
+    (mapcat #(take (dec n) %) (partition-all n coll))))
 
 ;; Split a sequence
 ;; http://www.4clojure.com/problem/49
 (def split-a-sequence
- (fn [n coll]
-   [(take n coll) (drop n coll)]))
+  (fn [n coll]
+    [(take n coll) (drop n coll)]))
 
 (juxt take drop)
 
@@ -22,14 +22,14 @@
 ;; A Half-Truth
 ;; https://www.4clojure.com/problem/83
 (def a-half-truth
- (fn [& args]
-   (and (boolean (some true? args)) (not-every? true? args))))
+  (fn [& args]
+    (and (boolean (some true? args)) (not-every? true? args))))
 
 ;; Map Construction
 ;; https://www.4clojure.com/problem/61
 (def map-construction
- (fn [a b]
-   (apply assoc {} (interleave a b))))
+  (fn [a b]
+    (apply assoc {} (interleave a b))))
 
 ;; Set Intersection
 ;; https://www.4clojure.com/problem/81
@@ -78,26 +78,26 @@
 ;; Product Digits
 ;; http://www.4clojure.com/problem/99
 (def product-digits
- (fn [a b]
-   (->> (* a b)
-        str
-        (map str)
-        (map #(Integer/parseInt %)))))
+  (fn [a b]
+    (->> (* a b)
+         str
+         (map str)
+         (map #(Integer/parseInt %)))))
 
 ;; Cartesian Product
 ;; http://www.4clojure.com/problem/90
 (def cartesian-product
- (fn [s1 s2]
-   (into #{} (for [s1 s1
-                   s2 s2]
-               [s1 s2])))
+  (fn [s1 s2]
+    (into #{} (for [s1 s1
+                    s2 s2]
+                [s1 s2])))
   )
 
 ;; Group a Sequence
 ;; http://www.4clojure.com/problem/63
 (def group-a-sequence
- (fn [f s]
-   (apply merge-with concat (map #(hash-map (f %) [%]) s)))
+  (fn [f s]
+    (apply merge-with concat (map #(hash-map (f %) [%]) s)))
   )
 
 ;; Symmetic Difference
@@ -443,13 +443,13 @@ Class
 ;; http://www.4clojure.com/problem/53
 (def longest-increasing-subseq
   (fn [coll]
-   (->> (map vector coll (range))
-        (partition-by #(apply - %))
-        (map #(map first %))
-        (filter #(> (count %) 1))
-        (sort-by (comp - count))
-        first
-        vec))
+    (->> (map vector coll (range))
+         (partition-by #(apply - %))
+         (map #(map first %))
+         (filter #(> (count %) 1))
+         (sort-by (comp - count))
+         first
+         vec))
   )
 
 ;; Euler's Totient Function
@@ -547,8 +547,8 @@ Class
 (def partially-flatten-sequence
   (fn [x]
     (filter #(every? (complement sequential?) %)
-     (filter sequential?
-             (rest (tree-seq sequential? seq x)))))
+            (filter sequential?
+                    (rest (tree-seq sequential? seq x)))))
   )
 
 ;; Global take-while
@@ -589,11 +589,11 @@ Class
   (fn [n]
     (let [rmap (sorted-map 1000 "M" 900 "CM" 500 "D" 400 "CD" 100 "C"
                            90 "XC" 50 "L" 40 "XL" 10 "X" 9 "IX" 5 "V" 4 "IV" 1 "I")]
-     (loop [s "" n n]
-       (if (zero? n)
-         s
-         (let [[arabic roman] (last (filter #(>= n (first %)) rmap))]
-           (recur (str s roman) (- n arabic)))))))
+      (loop [s "" n n]
+        (if (zero? n)
+          s
+          (let [[arabic roman] (last (filter #(>= n (first %)) rmap))]
+            (recur (str s roman) (- n arabic)))))))
   )
 
 ;; Generating k-combinations
@@ -617,14 +617,10 @@ Class
 ;; Sequs Horribilis
 ;; http://www.4clojure.com/problem/112
 (def sequs-horribilis
-  (fn [n coll]
-    (letfn [(sequs [cnt coll]
-              (loop [cnt cnt coll coll ret []]
-                (let [head (first coll)]
-                  (cond
-                    (nil? head) ret
-                    (coll? head) (conj ret (sequs cnt head))
-                    (> (+ cnt head) n) ret
-                    :else (recur (+ cnt head) (rest coll) (conj ret head))))))]
-      (sequs 0 coll)))
-  )
+  (fn _ [n [x & xs]]
+    (cond
+      (nil? x) '()
+      (coll? x) (let [s (_ n x)]
+                  (cons s (_ (- n (reduce + (flatten s))) xs)))
+      (<= x n) (cons x (_ (- n x) xs))
+      :e '())))
