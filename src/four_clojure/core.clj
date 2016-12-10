@@ -676,7 +676,7 @@ Class
     (empty?
      (reduce
       #(cond
-         (or (= \( %2) (= \[ %2) (= \{ %2)) (cons %2 %)
+         (#{\( \[ \{} %2) (cons %2 %)
          (= \) %2) (if (= \( (first %)) (rest %) (concat % (list false)))
          (= \] %2) (if (= \[ (first %)) (rest %) (concat % (list false)))
          (= \} %2) (if (= \{ (first %)) (rest %) (concat % (list false)))
