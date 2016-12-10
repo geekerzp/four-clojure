@@ -684,3 +684,21 @@ Class
       ()
       s)))
   )
+
+;; Sum Some Set Subsets
+;; http://www.4clojure.com/problem/131
+(def sum-some-set-subsets
+  (letfn [(power-set [s]
+            (reduce
+             (fn [r e] (into r (map #(conj % e) r)))
+             #{#{}} s))
+          (sans-null-set [s]
+            (disj (power-set s) #{}))]
+    (fn [& xs]
+      (->> xs
+          (map (comp set (partial map #(reduce + %)) sans-null-set))
+          (apply clojure.set/intersection)
+          not-empty
+          boolean)
+      ))
+  )
