@@ -668,3 +668,19 @@ Class
           z (f (* a b))]
       (- (+ x y) z)))
   )
+
+;; Balancing Brackets
+;; http://www.4clojure.com/problem/177
+(def balancing-brackets
+  (fn [s]
+    (empty?
+     (reduce
+      #(cond
+         (or (= \( %2) (= \[ %2) (= \{ %2)) (cons %2 %)
+         (= \) %2) (if (= \( (first %)) (rest %) (concat % (list false)))
+         (= \] %2) (if (= \[ (first %)) (rest %) (concat % (list false)))
+         (= \} %2) (if (= \{ (first %)) (rest %) (concat % (list false)))
+         :else (do (println %2) %))
+      ()
+      s)))
+  )
