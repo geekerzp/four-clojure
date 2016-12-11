@@ -702,3 +702,34 @@ Class
           boolean)
       ))
   )
+
+;; Palindromic Numbers
+;; http://www.4clojure.com/problem/150
+(def palindromic-numbers
+  (fn [x]
+    (letfn [(n2d [n]
+              (loop [n n ret '()]
+                (if (zero? n) ret
+                    (recur (quot n 10) (conj ret (rem n 10))))))
+
+            (d2n [xs]
+              (apply + (map * (reverse xs) (iterate (partial * 10) 1))))
+
+            (count-up [x]
+              (+ x (nth (iterate (partial * 10) 1) (/ (count (n2d x)) 2))))
+
+            (pnumber [x]
+              (let [s (n2d x)
+                    n (count s)
+                    [c _] (split-at (/ n 2) s)]
+                (d2n
+                 (cond
+                   (= s (reverse s)) s
+                   (odd? n) (concat c (rest (reverse c)))
+                   (even? n) (concat c (reverse c))))))
+
+            (pnumber-seq [x]
+              (lazy-seq
+               (cons (pnumber x) (pnumber-seq (count-up x)))))]
+      (drop-while #(< % x) (pnumber-seq x))))
+  )
