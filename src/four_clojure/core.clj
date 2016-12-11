@@ -733,3 +733,12 @@ Class
                (cons (pnumber x) (pnumber-seq (count-up x)))))]
       (drop-while #(< % x) (pnumber-seq x))))
   )
+
+;; Tricky card games
+;; http://www.4clojure.com/problem/141
+(def tricky-card-games
+  (fn [trump]
+    (fn [trick]
+      (let [lead-suit (if trump trump (:suit (first trick)))]
+        (last (sort-by :rank (filter #(= lead-suit (:suit %)) trick))))))
+  )
