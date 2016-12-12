@@ -742,3 +742,19 @@ Class
       (let [lead-suit (if trump trump (:suit (first trick)))]
         (last (sort-by :rank (filter #(= lead-suit (:suit %)) trick))))))
   )
+
+;; Infinite Matrix
+;; http://www.4clojure.com/problem/168
+(def infinite-matrix
+  (fn infinite-matrix
+    ([f]
+     (infinite-matrix f 0 0))
+    ([f m n]
+     (letfn [(inner [i j]
+               (lazy-seq (cons (f i j) (inner i (inc j)))))
+             (outer [i]
+               (lazy-seq (cons (inner i n) (outer (inc i)))))]
+       (outer m)))
+    ([f m n s t]
+     (take s (map #(take t %) (infinite-matrix f m n)))))
+  )
