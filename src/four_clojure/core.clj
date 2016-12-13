@@ -758,3 +758,16 @@ Class
     ([f m n s t]
      (take s (map #(take t %) (infinite-matrix f m n)))))
   )
+
+;; Parentheses... Again
+;; http://www.4clojure.com/problem/195
+(def parentheses-again
+  (fn [n]
+    (letfn [(aux [acc op cl]
+              (if (and (= op n) (= cl n))
+                [acc]
+                (concat
+                 (if (< op n) (aux (str acc "(") (inc op) cl))
+                 (if (< cl op) (aux (str acc ")") op (inc cl))))))]
+      (set (aux "" 0 0))))
+  )
