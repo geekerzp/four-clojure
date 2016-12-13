@@ -696,10 +696,10 @@ Class
             (disj (power-set s) #{}))]
     (fn [& xs]
       (->> xs
-          (map (comp set (partial map #(reduce + %)) sans-null-set))
-          (apply clojure.set/intersection)
-          not-empty
-          boolean)
+           (map (comp set (partial map #(reduce + %)) sans-null-set))
+           (apply clojure.set/intersection)
+           not-empty
+           boolean)
       ))
   )
 
@@ -762,12 +762,14 @@ Class
 ;; Parentheses... Again
 ;; http://www.4clojure.com/problem/195
 (def parentheses-again
-  (fn [n]
-    (letfn [(aux [acc op cl]
-              (if (and (= op n) (= cl n))
-                [acc]
-                (concat
-                 (if (< op n) (aux (str acc "(") (inc op) cl))
-                 (if (< cl op) (aux (str acc ")") op (inc cl))))))]
-      (set (aux "" 0 0))))
+  (fn parentheses
+    ([n] (parentheses n n))
+    ([left right]
+     (if (and (zero? left) (zero? right))
+       #{""}
+       (clojure.set/union
+        (when (> left 0)
+          (set (map #(str "(" % ) (parentheses (dec left) right))))
+        (when (> right left)
+          (set (map #(str ")" % ) (parentheses left (dec right)))))))))
   )
