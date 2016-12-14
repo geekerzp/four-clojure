@@ -795,3 +795,11 @@ Class
               (map roman
                    (re-seq #"CM|CD|XC|XL|IX|IV|[MDCLXVI]" s)))))
   )
+
+;; Analyze a Tic-Tac-Toe Board
+;; http://www.4clojure.com/problem/73
+(def analyze-tic-tac-toe-board
+  (fn [[[a b c :as f] [d e f :as s] [g h i :as t]]]
+    (some {[:o :o :o] :o [:x :x :x] :x}
+          [f s t [a d g] [b e h] [c f i] [a e i] [c e g]]))
+  )
