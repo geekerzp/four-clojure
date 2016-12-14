@@ -773,3 +773,25 @@ Class
         (when (> right left)
           (set (map #(str ")" % ) (parentheses left (dec right)))))))))
   )
+
+;; Read Roman numerals
+;; http://www.4clojure.com/problem/92
+(def read-roman-numerals
+  (fn [s]
+    (let [roman {"M" 1000
+                 "CM" 900
+                 "D"  500
+                 "CD" 400
+                 "C"  100
+                 "XC"  90
+                 "L"   50
+                 "XL"  40
+                 "X"   10
+                 "IX"   9
+                 "V"    5
+                 "IV"   4
+                 "I"    1}]
+      (reduce +
+              (map roman
+                   (re-seq #"CM|CD|XC|XL|IX|IV|[MDCLXVI]" s)))))
+  )
