@@ -848,12 +848,11 @@ Class
               (every? true?
                       (map (partial apply diff-one-char?) (partition 2 1 ws))))
 
-            (combination [coll]
-              (let [f (fn f [avec coll]
-                        (if (empty? coll) avec
-                            (for [x coll]
-                              (f (conj avec x) (remove #(= x %) coll)))))]
-                (partition (count coll)
-                           (flatten (f [] coll)))))]
-      (boolean (some chain? (combination s)))))
+            (permutations [s]
+              (lazy-seq
+               (if (seq (rest s))
+                 (apply concat (for [x s]
+                                 (map #(cons x %) (permutations (remove #{x} s)))))
+                 [s])))]
+      (boolean (some chain? (permutations s)))))
   )
