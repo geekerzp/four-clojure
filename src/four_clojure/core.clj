@@ -828,3 +828,32 @@ Class
         (if (= s1 s2) s1
             (recur s2 (infer s2))))))
   )
+
+;; Word Chains
+;; http://www.4clojure.com/problem/82
+(def word-chains
+  (fn [s]
+    (letfn [(diff-one-char? [w1 w2]
+              (cond
+                (= (count w1) (count w2)) (= 1 (count
+                                                (filter false?
+                                                        (map #(= % %2) w1 w2))))
+                :else (let [max-w (max-key count w1 w2)
+                            min-w (min-key count w1 w2)]
+                        (some #(= (seq min-w) %)
+                              (map #(concat (take % max-w) (drop (inc %) max-w))
+                                   (range (count max-w)))))))
+
+            (chain? [ws]
+              (every? true?
+                      (map (partial apply diff-one-char?) (partition 2 1 ws))))
+
+            (combination [coll]
+              (let [f (fn f [avec coll]
+                        (if (empty? coll) avec
+                            (for [x coll]
+                              (f (conj avec x) (remove #(= x %) coll)))))]
+                (partition (count coll)
+                           (flatten (f [] coll)))))]
+      (boolean (some chain? (combination s)))))
+  )
