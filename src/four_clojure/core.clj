@@ -803,3 +803,28 @@ Class
     (some {[:o :o :o] :o [:x :x :x] :x}
           [f s t [a d g] [b e h] [c f i] [a e i] [c e g]]))
   )
+
+;; Triangle Minimal Path
+;; http://www.4clojure.com/problem/79
+(def triangle-minimal-path
+  (fn [s]
+    (first
+     (reduce
+      #(map + (map min (butlast %1) (rest %1)) %2)
+      (reverse s))))
+  )
+
+;; Transitive Closure
+;; http://www.4clojure.com/problem/84
+(def transitive-closure
+  (fn [s]
+    (letfn [(infer [s]
+              (set
+               (concat s (for [[a b] s
+                               [d e] s
+                               :when (= b d)]
+                           [a e]))))]
+      (loop [s1 s s2 (infer s)]
+        (if (= s1 s2) s1
+            (recur s2 (infer s2))))))
+  )
