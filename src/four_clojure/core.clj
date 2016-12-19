@@ -856,3 +856,14 @@ Class
                  [s])))]
       (boolean (some chain? (permutations s)))))
   )
+
+;; Graph Connectivity
+;; http://www.4clojure.com/problem/91
+(def graph-connectivity
+  (fn [s]
+    (apply = (vals (reduce
+                    (fn [g [a b]]
+                      (let [r (clojure.set/union (g a #{a}) (g b #{b}))]
+                        (reduce #(assoc % %2 r) g r)))
+                    {} s))))
+  )
