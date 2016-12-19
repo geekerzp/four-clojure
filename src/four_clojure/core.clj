@@ -913,7 +913,8 @@ Class
     (cond (nil? h) (count b)
           (nil? f) (count a)
           (= f h) (recur t r)
-          :else (min (inc (lev t r))
-                     (inc (lev a r))
-                     (inc (lev t b)))))
+          :else (min (inc (lev t r)) ;; replace
+                     (inc (lev a r)) ;; insert
+                     (inc (lev t b)) ;; delete
+                     )))
   )
