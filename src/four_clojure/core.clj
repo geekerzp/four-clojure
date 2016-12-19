@@ -877,14 +877,15 @@ Class
                     j (range -1 2)
                     :when (not= 0 i j)]
                 (get-in b [(+ r i) (+ c j)])))]
-      (map #(apply str %)
-           (partition (count (first b))
-                      (for [i (range (count b))
-                            j (range (count (first b)))]
-                        (let [l (count (filter #(= \# %) (n i j)))]
-                          (cond
-                            (and (= l 2)
-                                 (= \# (get-in b [i j]))) \#
-                            (= l 3) \#
-                            :else \space)))))))
+      (let [r (count b) c (count (first b))]
+        (->>(for [i (range r)
+                  j (range c)]
+              (let [l (count (filter #(= \# %) (n i j)))]
+                (cond
+                  (and (= l 2)
+                       (= \# (get-in b [i j]))) \#
+                  (= l 3) \#
+                  :else \space)))
+            (partition c)
+            (map #(apply str %))))))
   )
