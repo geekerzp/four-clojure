@@ -905,3 +905,15 @@ Class
            count
            inc)))
   )
+
+;; Levenshtein Distance
+;; http://www.4clojure.com/problem/101
+(def levenshtien-distance
+  (fn lev [[h & t :as a] [f & r :as b]]
+    (cond (nil? h) (count b)
+          (nil? f) (count a)
+          (= f h) (recur t r)
+          :else (min (inc (lev t r))
+                     (inc (lev a r))
+                     (inc (lev t b)))))
+  )
