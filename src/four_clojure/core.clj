@@ -889,3 +889,19 @@ Class
             (partition c)
             (map #(apply str %))))))
   )
+
+;; Number Maze
+;; http://www.4clojure.com/problem/106
+(def number-maze
+  (fn [s e]
+    (letfn [(f [xs]
+              (lazy-cat [xs]
+                        (f (clojure.set/union
+                            (set (map #(+ % 2) xs))
+                            (set (map #(* % 2) xs))
+                            (set (map #(/ % 2) (filter even? xs)))))))]
+      (->> (f #{s})
+           (take-while #(not (contains? % e)))
+           count
+           inc)))
+  )
