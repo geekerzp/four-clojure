@@ -867,3 +867,24 @@ Class
                         (reduce #(assoc % %2 r) g r)))
                     {} s))))
   )
+
+;; Game of Life
+;; http://www.4clojure.com/problem/94
+(def game-of-life
+  (fn [b]
+    (letfn [(n [r c]
+              (for [i (range -1 2)
+                    j (range -1 2)
+                    :when (not= 0 i j)]
+                (get-in b [(+ r i) (+ c j)])))]
+      (map #(apply str %)
+           (partition (count (first b))
+                      (for [i (range (count b))
+                            j (range (count (first b)))]
+                        (let [l (count (filter #(= \# %) (n i j)))]
+                          (cond
+                            (and (= l 2)
+                                 (= \# (get-in b [i j]))) \#
+                            (= l 3) \#
+                            :else \space)))))))
+  )
