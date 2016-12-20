@@ -948,3 +948,13 @@ Class
                    (some #(= [p p p] %) (lines nb))))]
       (set (filter win? free))))
   )
+
+;; Making Data Dance
+;; http://www.4clojure.com/problem/113
+(def making-data-dance
+  (fn [& xs]
+    (reify
+      clojure.lang.Seqable
+      (toString [_] (apply str (interpose ", " (sort xs))))
+      (seq [_] (seq (distinct xs)))))
+  )
