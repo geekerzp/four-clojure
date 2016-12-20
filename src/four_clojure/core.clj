@@ -918,3 +918,16 @@ Class
                      (inc (lev t b)) ;; delete
                      )))
   )
+
+;; Graph Tour
+;; http://www.4clojure.com/problem/89
+(def graph-tour
+  (fn [g]
+    (letfn [(d [g]
+              (apply merge-with + {} (for [[a b] g
+                                           :when (not= a b)]
+                                       {a 1 b 1})))]
+      (and
+       (not (empty? (d g)))
+       (->> (vals (d g)) (filter odd?) count (>= 2)))))
+  )
