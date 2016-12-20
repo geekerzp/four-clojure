@@ -931,3 +931,20 @@ Class
        (not (empty? (d g)))
        (->> (vals (d g)) (filter odd?) count (>= 2)))))
   )
+
+;; Win at Tic-Tac-Toe
+;; http://www.4clojure.com/problem/119
+(def win-at-tic-tac-toe
+  (fn [p b]
+    (let [free (for [x (range 3)
+                     y (range 3)
+                     :when (= :e (get-in b [x y]))]
+                 [x y])
+          lines #(concat % (apply map vector %)
+                         [(map get % [0 1 2])]
+                         [(map get % [2 1 0])])
+          win? (fn [[x y]]
+                 (let [nb (assoc-in b [x y] p)]
+                   (some #(= [p p p] %) (lines nb))))]
+      (set (filter win? free))))
+  )
