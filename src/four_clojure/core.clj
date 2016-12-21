@@ -1044,3 +1044,15 @@ Class
     (let [s "(fn [] (let [s %s] (format s (pr-str s))))"]
       (format s (pr-str s))))
   )
+
+;; Crossword puzzle
+;; http://www.4clojure.com/problem/111
+(def crossword-puzzle
+  (fn [word board]
+    (->> board
+         (apply map str)
+         (concat board)
+         (map #(clojure.string/replace % #"#|_| " {"#" "|" "_" "." " " ""}))
+         (map #(re-matches (re-pattern %) word))
+         ((complement every?) nil?)))
+  )
