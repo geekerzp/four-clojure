@@ -1056,3 +1056,26 @@ Class
          (map #(re-matches (re-pattern %) word))
          ((complement every?) nil?)))
   )
+
+;; Analyze Reversi
+;; http://www.4clojure.com/problem/124
+(def analyze-reversi
+  (fn [board color]
+    (into {} (for [y (range 4)
+                   x (range 4)
+                   move (for [dx [-1 0 1]
+                              dy [-1 0 1]
+                              l [3 4]
+                              :when (not= 0 dx dy)]
+                          (map (juxt #(* dx %) #(* dy %)) (range l)))
+                   :let [line (map #(map + [x y] %) move)]
+                   :when (every? (partial every? #(<= 0 % 3)) line)
+                   :let [from (first line)
+                         to (last line)
+                         over (rest (butlast line))
+                         other-color ({'b 'w 'w 'b} color)]
+                   :when (and (= (get-in board from) color)
+                              (= (get-in board to) 'e)
+                              (every? #(= other-color (get-in board %)) over))]
+               [to (set over)])))
+  )
