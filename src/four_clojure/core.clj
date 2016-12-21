@@ -1036,3 +1036,11 @@ Class
         pr? :pair
         :else :high-card)))
   )
+
+;; Gus' Quinundrum
+;; http://www.4clojure.com/problem/125
+(def gus-quinundrum
+  (fn []
+    (let [s "(fn [] (let [s %s] (format s (pr-str s))))"]
+      (format s (pr-str s))))
+  )
