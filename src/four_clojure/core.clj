@@ -996,3 +996,43 @@ Class
           :else (recur (clojure.set/difference (set (mapcat #(moves % maze) ps)) seen)
                        (into seen ps))))))
   )
+
+;; Best Hand
+;; http://www.4clojure.com/problem/178
+(def best-hand
+  (fn [cards]
+    (let [anl (fn [[s r]]
+                {:suit ((zipmap "DHCS" [:diamond :heart :club :spade]) s)
+                 :rank ((zipmap "23456789TJQKA" (range)) r)})
+          cs (map anl cards)
+          suits (sort (map :suit cs))
+          ranks (sort (map :rank cs))
+          minr (first ranks)
+          rnkcount (reduce #(max % (count %2)) 0 (partition-by identity ranks))
+          sf? (and (apply = suits)
+                   (= ranks (range minr (+ minr 5))))
+          fk? (= 4
+                 (apply max
+                        (map count
+                             (vals (group-by identity ranks)))))
+          fh? (and (= (count (distinct ranks)) 2)
+                   (or (apply = (take 2 ranks))
+                       (apply = (take 3 ranks))))
+          fl? (apply = suits)
+          st? (or (= ranks (range minr (+ minr 5)))
+                  (= ranks (concat (range 4) (list 12))))
+          tk? (= 3 rnkcount)
+          tp? (= 2 (count (filter #(= 2 (count %))
+                                  (partition-by identity ranks))))
+          pr? (= 2 rnkcount)]
+      (cond
+        sf? :straight-flush
+        fk? :four-of-a-kind
+        fh? :full-house
+        fl? :flush
+        st? :straight
+        tk? :three-of-a-kind
+        tp? :two-pair
+        pr? :pair
+        :else :high-card)))
+  )
