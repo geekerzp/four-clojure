@@ -958,3 +958,41 @@ Class
       (toString [_] (apply str (interpose ", " (sort xs))))
       (seq [_] (seq (distinct xs)))))
   )
+
+;; For Science!
+;; http://www.4clojure.com/problem/117
+(def for-science
+  (let [size (fn [maze]
+               (let [y (count maze)
+                     x (count (first maze))]
+                 [y x]))
+
+        find-mouse (fn [maze]
+                     (first
+                      (let [[ym xm] (size maze)]
+                        (for [y (range ym)
+                              x (range xm)
+                              :when (= \M (get-in maze [y x]))]
+                          [y x]))))
+
+        neighbors [[-1 0]
+                   [1 0]
+                   [0 -1]
+                   [0 1]]
+
+        moves (fn [pos maze]
+                (for [neighbor neighbors
+                      :let [pos (mapv + pos neighbor)]
+                      :when (and (every? (complement neg?) pos)
+                                 (every? identity (map < pos (size maze)))
+                                 (not= \# (get-in maze pos)))]
+                  pos))]
+    (fn [maze]
+      (loop [ps [(find-mouse maze)]
+             seen #{}]
+        (cond
+          (some #(= \C (get-in maze %)) ps) true
+          (empty? ps) false
+          :else (recur (clojure.set/difference (set (mapcat #(moves % maze) ps)) seen)
+                       (into seen ps))))))
+  )
