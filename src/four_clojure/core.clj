@@ -1079,3 +1079,52 @@ Class
                               (every? #(= other-color (get-in board %)) over))]
                [to (set over)])))
   )
+
+;; Squares Squared
+;; http://www.4clojure.com/problem/138
+(def squares-squared
+  (fn [start end]
+    (let [digit-chars (mapcat (comp seq str)
+                              (take-while #(>= end %)
+                                          (iterate #(* % %) start)))
+          path-length (first (drop-while #(> (count digit-chars) %)
+                                         (map #(* % %) (iterate inc 1))))
+          move (fn [{:keys [position direction path direction-map]}]
+                 (let [keep-direction? (boolean (some #(= % (mapv +
+                                                                  position
+                                                                  (direction-map direction)))
+                                                      path))
+                       next-direction (if keep-direction?
+                                        direction
+                                        (direction-map direction))] ; turn right
+                   {:path (conj path position)
+                    :position (mapv + position next-direction)
+                    :direction next-direction
+                    :direction-map direction-map}))
+          coords (first (filter #(= path-length (count %))
+                                (map :path
+                                     (iterate move
+                                              {:path []
+                                               :position [0 0]
+                                               :direction [-1 1]
+                                               :direction-map {[1 1] [1 -1]
+                                                               [1 -1][-1 -1]
+                                                               [-1 -1][-1 1]
+                                                               [-1 1] [1 1]}}))))
+          adjust-coords (fn [coords]
+                          (let [dy (- (apply min (map first coords)))
+                                dx (- (apply min (map last coords)))]
+                            (map #(mapv + % [dy dx]) coords)))
+          coords-with-char (into {}
+                                 (map vector
+                                      (adjust-coords coords)
+                                      (concat digit-chars (repeat \*))))
+          m (count (distinct (map first (keys coords-with-char))))
+          template (vec (repeat m
+                                (vec (repeat m \space))))]
+      (mapv #(apply str %)
+            (reduce (fn [t [k v]]
+                      (assoc-in t k v))
+                    template
+                    coords-with-char))))
+  )
