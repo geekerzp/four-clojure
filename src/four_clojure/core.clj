@@ -1140,18 +1140,11 @@ Class
 ;; Tree reparenting
 ;; http://www.4clojure.com/problem/130
 (def tree-reparenting
-  (fn [n tree]
-    (->> [tree nil]
-         (tree-seq
-          (constantly true)
-          (fn [[[nh & nt] old-tree]]
-            (for [i nt]
-              [i (concat [nh]
-                         (remove #(= i %) nt)
-                         (if old-tree (list old-tree)))])))
-         (filter #(= n (ffirst %)))
-         first
-         (map vec)
-         (apply conj)
-         (remove #(= () %))))
+  (fn [parent tree]
+    (loop [t tree acc nil]
+      (let [[f r]
+            ((juxt filter remove) #(some #{parent} (flatten %)) t)]
+        (if-let [h (first f)]
+          (recur h (concat r (if acc (list acc) acc)))
+          (concat r (if acc (list acc) acc))))))
   )
