@@ -1148,3 +1148,19 @@ Class
           (recur h (concat r (if acc (list acc) acc)))
           (concat r (if acc (list acc) acc))))))
   )
+
+;; Language of a DFA
+;; http://www.4clojure.com/problem/164
+(def DFA
+  (fn language [{:keys [states alphabet start accepts transitions]}]
+    (letfn [(alpha-for [[word state]]
+              (let [trans (map (fn [[letter to-state]]
+                                 (vector (str word letter) to-state))
+                               (seq (get transitions state)))
+                    complete-words (filter (fn [[word to-state]]
+                                             (accepts to-state))
+                                           trans)]
+                (concat (keys (into {} complete-words))
+                        (lazy-seq (mapcat alpha-for trans)))))]
+      (alpha-for ["" start])))
+  )
