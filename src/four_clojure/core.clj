@@ -1101,7 +1101,7 @@ Class
                                         (some #(= % (mapv +
                                                           position
                                                           (direction-map direction)))
-                                                      path))
+                                              path))
                        next-direction (if keep-direction?
                                         direction
                                         (direction-map direction))] ; turn right
@@ -1164,3 +1164,59 @@ Class
                         (lazy-seq (mapcat alpha-for trans)))))]
       (alpha-for ["" start])))
   )
+
+;; Love Triangle
+;; http://www.4clojure.com/problem/127
+(def love-triangle
+  (fn [coll]
+    (letfn [(digits
+              [n b]
+              (if (< n b)
+                [n]
+                (conj (digits (quot n b) b) (mod n b))))
+            (board
+              [coll]
+              (let [digits-seq (map #(digits % 2) coll)
+                    n (apply max (map count digits-seq))]
+                (into []
+                      (for [s digits-seq
+                            :let [size (count s)]]
+                        (if (= size n)
+                          s
+                          (vec (concat (repeat (- n size) 0) s)))))))
+            (coords
+              [b [y x] [y' x'] direction]
+              (let [coord-seq (if (= y y')
+                                (mapv vector (repeat y) (range x (inc x')))
+                                (mapv vector (range y (inc y')) (repeat x)))]
+                (if (and (every? #(<= 0 %) (flatten coord-seq))
+                         (every? #(= 1 (get-in b %)) coord-seq))
+                  (concat coord-seq (coords b
+                                            (mapv + (first coord-seq) (first direction))
+                                            (mapv + (peek coord-seq) (peek direction))
+                                            direction))
+                  [])))]
+      (let [b (board coll)
+            m (count b)
+            n (count (first b))]
+        (->>
+         (mapcat (fn [p]
+                   (map #(coords b p p %)
+                        [[[1 -1] [1 1]]
+                         [[-1 1] [1 1]]
+                         [[-1 -1][-1 1]]
+                         [[-1 -1] [1 -1]]
+                         [[1 0][1 1]]
+                         [[0 1][1 1]]
+                         [[-1 1][0 1]]
+                         [[-1 0][-1 1]]
+                         [[-1 -1][-1 0]]
+                         [[-1 -1][0 -1]]
+                         [[0 -1] [1 -1]]
+                         [[1 -1] [1 0]]]))
+                 (for [y (range m) x (range n)]
+                   [y x]))
+         (filter #(not (empty? %)))
+         (map count)
+         (apply max)
+         (#(if (not= 1 %) %)))))))
