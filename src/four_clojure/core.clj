@@ -1168,55 +1168,52 @@ Class
 ;; Love Triangle
 ;; http://www.4clojure.com/problem/127
 (def love-triangle
-  (fn [coll]
-    (letfn [(digits
-              [n b]
-              (if (< n b)
-                [n]
-                (conj (digits (quot n b) b) (mod n b))))
-            (board
-              [coll]
-              (let [digits-seq (map #(digits % 2) coll)
-                    n (apply max (map count digits-seq))]
-                (into []
-                      (for [s digits-seq
-                            :let [size (count s)]]
-                        (if (= size n)
-                          s
-                          (vec (concat (repeat (- n size) 0) s)))))))
-            (coords
-              [b [y x] [y' x'] direction]
-              (let [coord-seq (if (= y y')
-                                (mapv vector (repeat y) (range x (inc x')))
-                                (mapv vector (range y (inc y')) (repeat x)))]
-                (if (and (every? #(<= 0 %) (flatten coord-seq))
-                         (every? #(= 1 (get-in b %)) coord-seq))
-                  (concat coord-seq (coords b
-                                            (mapv + (first coord-seq) (first direction))
-                                            (mapv + (peek coord-seq) (peek direction))
-                                            direction))
-                  [])))]
-      (let [b (board coll)
-            m (count b)
-            n (count (first b))]
-        (->>
-         (mapcat (fn [p]
-                   (map #(coords b p p %)
-                        [[[1 -1] [1 1]]
-                         [[-1 1] [1 1]]
-                         [[-1 -1][-1 1]]
-                         [[-1 -1] [1 -1]]
-                         [[1 0][1 1]]
-                         [[0 1][1 1]]
-                         [[-1 1][0 1]]
-                         [[-1 0][-1 1]]
-                         [[-1 -1][-1 0]]
-                         [[-1 -1][0 -1]]
-                         [[0 -1] [1 -1]]
-                         [[1 -1] [1 0]]]))
-                 (for [y (range m) x (range n)]
-                   [y x]))
-         (filter #(not (empty? %)))
-         (map count)
-         (apply max)
-         (#(if (not= 1 %) %)))))))
+  (fn [mine]
+    (let [widest (apply max mine)
+          mine-width (int (Math/ceil (/ (Math/log widest) (Math/log 2))))
+          mine-height (count mine)
+          bmap (vec (for [line mine]
+                      (vec (for [bit (range (dec mine-width) -1 -1)]
+                             (if (bit-test line bit) 1 0)))))
+          lines [[-1 0] [-1 -1] [0 -1] [1 -1] [1 0] [1 1] [0 1] [-1 1]]
+          ;; sides is vector for each side, two equal lengths and the
+          ;; opposite side
+          sides (map list lines (drop 2 (cycle lines)) (drop 3 (cycle lines)))
+          triangles (for [x (range mine-width)
+                          y (range mine-width)
+                          :when (= 1 (get-in bmap [y x]))
+                          ;; test each 1 as corner with equal length sides
+                          ;; angles: 90, orientations 8*45
+                          ;; u is vector for one equal side, v for the other
+                          ;; d is the vector of the third, non-equal side
+                          [[udx udy] [vdx vdy] [ddx ddy]] sides
+                          ]
+                      ;; construct increasing size layers along each side
+                      (->> (map (fn [l]
+                                  (let [ux (+ x (* udx l))
+                                        uy (+ y (* udy l))
+                                        vx (+ x (* vdx l))
+                                        vy (+ y (* vdy l))]
+                                    [[ux uy] [vx vy]])) (range))
+                           (take-while (fn [[[ux uy] [vx vy]]]
+                                         (and (< -1 ux mine-width)
+                                              (< -1 uy mine-height)
+                                              (< -1 vx mine-width)
+                                              (< -1 vy mine-height))))
+                           (map (fn [[[ux uy] [vx vy]]]
+                                  ;; walk between two point on the
+                                  ;; equal sides, paralel to the
+                                  ;; opposite side
+                                  (for [[lx ly] (concat [[vx vy]]
+                                                        (take-while (complement #{[vx vy]})
+                                                                    (iterate (fn [[ux uy]]
+                                                                               [(+ ux ddx) (+ uy ddy)]) [ux uy])))]
+                                    (get-in bmap [ly lx]))))
+                           (take-while #(every? #{1} %)) ;; whole layer is mineral
+                           (map count) ;; sum per layer
+                           (reduce +)  ;; total for triangle
+                           )
+                      )
+          biggest (apply max triangles)]
+      (when (< 1 biggest)
+        biggest))))
