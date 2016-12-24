@@ -1156,7 +1156,7 @@ Class
     (letfn [(alpha-for [[word state]]
               (let [trans (map (fn [[letter to-state]]
                                  (vector (str word letter) to-state))
-                               (seq (get transitions state)))
+                               (seq (transitions state)))
                     complete-words (filter (fn [[word to-state]]
                                              (accepts to-state))
                                            trans)]
