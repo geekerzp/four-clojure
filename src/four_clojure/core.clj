@@ -1239,12 +1239,11 @@ Class
 
           score-position
           (fn [row idx]
-            (let [inputs [row idx]
-                  bot-left (apply grow-bottom-left inputs)
-                  bot-right (apply grow-bottom-right inputs)
+            (let [bot-left (apply grow-bottom-left [row idx])
+                  bot-right (apply grow-bottom-right [row idx])
                   bot-middle (combine-triangles bot-left bot-right)
-                  top-left (apply grow-top-left inputs)
-                  top-right (apply grow-top-right inputs)
+                  top-left (apply grow-top-left [row idx])
+                  top-right (apply grow-top-right [row idx])
                   top-middle (combine-triangles top-left top-right)
                   bot-ldown (grow-triangle-down bot-left grow-top-left row idx)
                   bot-rdown (grow-triangle-down bot-right grow-top-right row idx)]
