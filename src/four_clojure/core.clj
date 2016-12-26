@@ -1252,7 +1252,9 @@ Class
           (into [] (map #(lengthen-row % matrix-width) matrix-base))
 
           score
-          (apply max (for [row (range (count matrix)) col (range matrix-width)]
+          (apply max (for [row (range (count matrix))
+                           col (range matrix-width)]
                        (score-position matrix row col)))]
-      (when (> score 2) score)))
+      (when (> score 2)
+        score)))
   )
