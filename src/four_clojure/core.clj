@@ -1256,3 +1256,26 @@ Class
       (when (> score 2)
         score)))
   )
+
+;; Veitch, Please!
+;; http://www.4clojure.com/problem/140
+(def veitch-please
+  (fn [m]
+    (let [sd clojure.set/difference
+          si clojure.set/intersection
+          su clojure.set/union
+          w (count (first m))
+          g (group-by
+             (fn [r]
+               (count (filter #(#{'A 'B 'C 'D} %) r)))
+             m)
+          pv (for [i (range w) j (g i) k (g (inc i))
+                   :when (contains?
+                          #{#{'A 'a}, #{'B 'b}, #{'C 'c}, #{'D 'd}}
+                          (sd (su j k) (si j k)))]
+               [#{j k} (si j k)])
+          p2 (set (map last pv))]
+      (if (empty? p2)
+        (disj m #{'A 'd})
+        (recur (su (sd m (apply su (map first pv))) p2)))))
+  )
