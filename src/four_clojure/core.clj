@@ -1169,57 +1169,90 @@ Class
 ;; http://www.4clojure.com/problem/127
 (def love-triangle
   (fn mine [rocks]
-    (let [lengthen-row (fn [row max-size]
-                         (let [row (map #(if (= \1 %) 1 0) row)
-                               width (count row)]
-                           (if (< width max-size)
-                             (into [] (concat (repeat (- max-size width) 0) row))
-                             (into [] row))))
-          row-down (fn [matrix row level]
-                     (get matrix (+ row level)))
-          row-up (fn [matrix row level]
-                   (get matrix (- row level)))
-          row-left (fn [level idx]
-                     (take level (iterate dec idx)))
-          row-right (fn [level idx]
-                      (take level (iterate inc idx)))
-          grow-base (fn [level-fn h-fn v-fn]
-                      (fn [matrix row idx level]
-                        (loop [value level level level]
-                          (let [test-level (level-fn level)
-                                mrow (h-fn matrix row level)]
-                            (if (every? (fn [x] (= 1 x))
-                                        (map #(get mrow %) (v-fn test-level idx)))
-                              (recur (+ value test-level) test-level)
-                              [value level])))))
-          grow-bottom-left (grow-base inc row-down row-left)
-          grow-bottom-right (grow-base inc row-down row-right)
-          grow-top-left (grow-base inc row-up row-left)
-          grow-top-right (grow-base inc row-up row-right)
-          combine-triangles (fn [t1 t2]
-                              (if (= (second t1) (second t2))
-                                (- (+ (first t1) (first t2)) (second t1))
-                                0))
-          grow-triangle-down (fn [t1 grow-top-fn matrix row idx]
-                               (let [level (second t1)
-                                     t2 (grow-top-fn matrix (+ row (* 2 (- level 1))) idx 0)]
-                                 (combine-triangles t1 t2)))
-          score-position (fn [matrix row idx]
-                           (let [inputs [matrix row idx 0]
-                                 bot-left (apply grow-bottom-left inputs)
-                                 bot-right (apply grow-bottom-right inputs)
-                                 bot-middle (combine-triangles bot-left bot-right)
-                                 top-left (apply grow-top-left inputs)
-                                 top-right (apply grow-top-right inputs)
-                                 top-middle (combine-triangles top-left top-right)
-                                 bot-ldown (grow-triangle-down bot-left grow-top-left matrix row idx)
-                                 bot-rdown (grow-triangle-down bot-right grow-top-right matrix row idx)]
-                             (apply max (concat (map first [bot-left bot-right top-left top-right])
-                                                [bot-middle top-middle bot-ldown bot-rdown]))))
-          matrix-base (map #(Integer/toBinaryString %) rocks)
-          matrix-width (apply max (map count matrix-base))
-          matrix (into [] (map #(lengthen-row % matrix-width) matrix-base))
-          score (apply max (for [row (range (count matrix)) col (range matrix-width)]
-                             (score-position matrix row col)))]
+    (let [lengthen-row
+          (fn [row max-size]
+            (let [row (map #(if (= \1 %) 1 0) row)
+                  width (count row)]
+              (if (< width max-size)
+                (into [] (concat (repeat (- max-size width) 0) row))
+                (into [] row))))
+
+          row-down
+          (fn [matrix row level]
+            (get matrix (+ row level)))
+
+          row-up
+          (fn [matrix row level]
+            (get matrix (- row level)))
+
+          row-left
+          (fn [level idx]
+            (take level (iterate dec idx)))
+
+          row-right
+          (fn [level idx]
+            (take level (iterate inc idx)))
+
+          grow-base
+          (fn [level-fn h-fn v-fn]
+            (fn [matrix row idx level]
+              (loop [value level level level]
+                (let [test-level (level-fn level)
+                      mrow (h-fn matrix row level)]
+                  (if (every? (fn [x] (= 1 x))
+                              (map #(get mrow %) (v-fn test-level idx)))
+                    (recur (+ value test-level) test-level)
+                    [value level])))))
+
+          grow-bottom-left
+          (grow-base inc row-down row-left)
+
+          grow-bottom-right
+          (grow-base inc row-down row-right)
+
+          grow-top-left
+          (grow-base inc row-up row-left)
+
+          grow-top-right
+          (grow-base inc row-up row-right)
+
+          combine-triangles
+          (fn [t1 t2]
+            (if (= (second t1) (second t2))
+              (- (+ (first t1) (first t2)) (second t1))
+              0))
+
+          grow-triangle-down
+          (fn [t1 grow-top-fn matrix row idx]
+            (let [level (second t1)
+                  t2 (grow-top-fn matrix (+ row (* 2 (- level 1))) idx 0)]
+              (combine-triangles t1 t2)))
+
+          score-position
+          (fn [matrix row idx]
+            (let [inputs [matrix row idx 0]
+                  bot-left (apply grow-bottom-left inputs)
+                  bot-right (apply grow-bottom-right inputs)
+                  bot-middle (combine-triangles bot-left bot-right)
+                  top-left (apply grow-top-left inputs)
+                  top-right (apply grow-top-right inputs)
+                  top-middle (combine-triangles top-left top-right)
+                  bot-ldown (grow-triangle-down bot-left grow-top-left matrix row idx)
+                  bot-rdown (grow-triangle-down bot-right grow-top-right matrix row idx)]
+              (apply max (concat (map first [bot-left bot-right top-left top-right])
+                                 [bot-middle top-middle bot-ldown bot-rdown]))))
+
+          matrix-base
+          (map #(Integer/toBinaryString %) rocks)
+
+          matrix-width
+          (apply max (map count matrix-base))
+
+          matrix
+          (into [] (map #(lengthen-row % matrix-width) matrix-base))
+
+          score
+          (apply max (for [row (range (count matrix)) col (range matrix-width)]
+                       (score-position matrix row col)))]
       (when (> score 2) score)))
   )
