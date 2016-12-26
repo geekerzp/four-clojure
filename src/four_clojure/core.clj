@@ -1206,11 +1206,10 @@ Class
           (fn [h-fn v-fn]
             (fn [row idx]
               (loop [acc 0 level 0]
-                (let [test-level (inc level)
-                      mrow (h-fn row level)]
+                (let [row-data (h-fn row level)]
                   (if (every? (fn [x] (= 1 x))
-                              (map #(get mrow %) (v-fn test-level idx)))
-                    (recur (+ acc test-level) test-level)
+                              (map #(get row-data %) (v-fn (inc level) idx)))
+                    (recur (+ acc (inc level)) (inc level))
                     [acc level])))))
 
           grow-bottom-left
