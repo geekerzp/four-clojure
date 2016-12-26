@@ -1168,52 +1168,58 @@ Class
 ;; Love Triangle
 ;; http://www.4clojure.com/problem/127
 (def love-triangle
-  (fn [mine]
-    (let [widest (apply max mine)
-          mine-width (int (Math/ceil (/ (Math/log widest) (Math/log 2))))
-          mine-height (count mine)
-          bmap (vec (for [line mine]
-                      (vec (for [bit (range (dec mine-width) -1 -1)]
-                             (if (bit-test line bit) 1 0)))))
-          lines [[-1 0] [-1 -1] [0 -1] [1 -1] [1 0] [1 1] [0 1] [-1 1]]
-          ;; sides is vector for each side, two equal lengths and the
-          ;; opposite side
-          sides (map list lines (drop 2 (cycle lines)) (drop 3 (cycle lines)))
-          triangles (for [x (range mine-width)
-                          y (range mine-width)
-                          :when (= 1 (get-in bmap [y x]))
-                          ;; test each 1 as corner with equal length sides
-                          ;; angles: 90, orientations 8*45
-                          ;; u is vector for one equal side, v for the other
-                          ;; d is the vector of the third, non-equal side
-                          [[udx udy] [vdx vdy] [ddx ddy]] sides
-                          ]
-                      ;; construct increasing size layers along each side
-                      (->> (map (fn [l]
-                                  (let [ux (+ x (* udx l))
-                                        uy (+ y (* udy l))
-                                        vx (+ x (* vdx l))
-                                        vy (+ y (* vdy l))]
-                                    [[ux uy] [vx vy]])) (range))
-                           (take-while (fn [[[ux uy] [vx vy]]]
-                                         (and (< -1 ux mine-width)
-                                              (< -1 uy mine-height)
-                                              (< -1 vx mine-width)
-                                              (< -1 vy mine-height))))
-                           (map (fn [[[ux uy] [vx vy]]]
-                                  ;; walk between two point on the
-                                  ;; equal sides, paralel to the
-                                  ;; opposite side
-                                  (for [[lx ly] (concat [[vx vy]]
-                                                        (take-while (complement #{[vx vy]})
-                                                                    (iterate (fn [[ux uy]]
-                                                                               [(+ ux ddx) (+ uy ddy)]) [ux uy])))]
-                                    (get-in bmap [ly lx]))))
-                           (take-while #(every? #{1} %)) ;; whole layer is mineral
-                           (map count) ;; sum per layer
-                           (reduce +)  ;; total for triangle
-                           )
-                      )
-          biggest (apply max triangles)]
-      (when (< 1 biggest)
-        biggest))))
+  (fn mine [rocks]
+    (let [lengthen-row (fn [row max-size]
+                         (let [row (map #(if (= \1 %) 1 0) row)
+                               width (count row)]
+                           (if (< width max-size)
+                             (into [] (concat (repeat (- max-size width) 0) row))
+                             (into [] row))))
+          row-down (fn [matrix row level]
+                     (get matrix (+ row level)))
+          row-up (fn [matrix row level]
+                   (get matrix (- row level)))
+          row-left (fn [level idx]
+                     (take level (iterate dec idx)))
+          row-right (fn [level idx]
+                      (take level (iterate inc idx)))
+          grow-base (fn [level-fn h-fn v-fn]
+                      (fn [matrix row idx level]
+                        (loop [value level level level]
+                          (let [test-level (level-fn level)
+                                mrow (h-fn matrix row level)]
+                            (if (every? (fn [x] (= 1 x))
+                                        (map #(get mrow %) (v-fn test-level idx)))
+                              (recur (+ value test-level) test-level)
+                              [value level])))))
+          grow-bottom-left (grow-base inc row-down row-left)
+          grow-bottom-right (grow-base inc row-down row-right)
+          grow-top-left (grow-base inc row-up row-left)
+          grow-top-right (grow-base inc row-up row-right)
+          combine-triangles (fn [t1 t2]
+                              (if (= (second t1) (second t2))
+                                (- (+ (first t1) (first t2)) (second t1))
+                                0))
+          grow-triangle-down (fn [t1 grow-top-fn matrix row idx]
+                               (let [level (second t1)
+                                     t2 (grow-top-fn matrix (+ row (* 2 (- level 1))) idx 0)]
+                                 (combine-triangles t1 t2)))
+          score-position (fn [matrix row idx]
+                           (let [inputs [matrix row idx 0]
+                                 bot-left (apply grow-bottom-left inputs)
+                                 bot-right (apply grow-bottom-right inputs)
+                                 bot-middle (combine-triangles bot-left bot-right)
+                                 top-left (apply grow-top-left inputs)
+                                 top-right (apply grow-top-right inputs)
+                                 top-middle (combine-triangles top-left top-right)
+                                 bot-ldown (grow-triangle-down bot-left grow-top-left matrix row idx)
+                                 bot-rdown (grow-triangle-down bot-right grow-top-right matrix row idx)]
+                             (apply max (concat (map first [bot-left bot-right top-left top-right])
+                                                [bot-middle top-middle bot-ldown bot-rdown]))))
+          matrix-base (map #(Integer/toBinaryString %) rocks)
+          matrix-width (apply max (map count matrix-base))
+          matrix (into [] (map #(lengthen-row % matrix-width) matrix-base))
+          score (apply max (for [row (range (count matrix)) col (range matrix-width)]
+                             (score-position matrix row col)))]
+      (when (> score 2) score)))
+  )
