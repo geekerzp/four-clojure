@@ -1260,22 +1260,39 @@ Class
 ;; Veitch, Please!
 ;; http://www.4clojure.com/problem/140
 (def veitch-please
-  (fn [m]
-    (let [sd clojure.set/difference
-          si clojure.set/intersection
-          su clojure.set/union
-          w (count (first m))
-          g (group-by
-             (fn [r]
-               (count (filter #(#{'A 'B 'C 'D} %) r)))
-             m)
-          pv (for [i (range w) j (g i) k (g (inc i))
-                   :when (contains?
-                          #{#{'A 'a}, #{'B 'b}, #{'C 'c}, #{'D 'd}}
-                          (sd (su j k) (si j k)))]
-               [#{j k} (si j k)])
-          p2 (set (map last pv))]
-      (if (empty? p2)
-        (disj m #{'A 'd})
-        (recur (su (sd m (apply su (map first pv))) p2)))))
+  (fn [minterms]
+    (letfn [(covers? [prime minterm]
+              (= prime (clojure.set/intersection prime minterm)))
+            (essential? [prime primes minterms]
+              (true?
+               (some true?
+                     (map (fn [minterm]
+                            (= 1 (count (filter #(covers? % minterm) primes))))
+                          (filter #(covers? prime %) minterms)))))
+            (minimize-primes [not-covered primes used-primes]
+              (if (empty? not-covered)
+                used-primes
+                (let [essential (first
+                                 (filter #(essential? % primes not-covered) primes))]
+                  (recur (remove #(covers? essential %) not-covered)
+                         (disj primes essential)
+                         (conj used-primes essential)))))]
+     (loop [m minterms]
+       (let [sd clojure.set/difference
+             si clojure.set/intersection
+             su clojure.set/union
+             w (count (first m))
+             g (group-by
+                (fn [r]
+                  (count (filter #(#{'A 'B 'C 'D} %) r)))
+                m)
+             pv (for [i (range w) j (g i) k (g (inc i))
+                      :when (contains?
+                             #{#{'A 'a}, #{'B 'b}, #{'C 'c}, #{'D 'd}}
+                             (sd (su j k) (si j k)))]
+                  [#{j k} (si j k)])
+             p2 (set (map last pv))]
+         (if (empty? p2)
+           (minimize-primes minterms m #{})
+           (recur (su (sd m (apply su (map first pv))) p2)))))))
   )
