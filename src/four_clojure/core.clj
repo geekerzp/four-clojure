@@ -1264,11 +1264,10 @@ Class
     (letfn [(covers? [prime minterm]
               (= prime (clojure.set/intersection prime minterm)))
             (essential? [prime primes minterms]
-              (true?
-               (some true?
-                     (map (fn [minterm]
-                            (= 1 (count (filter #(covers? % minterm) primes))))
-                          (filter #(covers? prime %) minterms)))))
+              (some true?
+                    (map (fn [minterm]
+                           (= 1 (count (filter #(covers? % minterm) primes))))
+                         (filter #(covers? prime %) minterms))))
             (minimize-primes [not-covered primes used-primes]
               (if (empty? not-covered)
                 used-primes
