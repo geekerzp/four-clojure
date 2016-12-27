@@ -1271,27 +1271,29 @@ Class
             (minimize-primes [not-covered primes used-primes]
               (if (empty? not-covered)
                 used-primes
-                (let [essential (first
-                                 (filter #(essential? % primes not-covered) primes))]
+                (let [essential (->> primes
+                                     (filter #(essential? % primes not-covered))
+                                     first)]
                   (recur (remove #(covers? essential %) not-covered)
                          (disj primes essential)
                          (conj used-primes essential)))))]
      (loop [m minterms]
-       (let [sd clojure.set/difference
-             si clojure.set/intersection
-             su clojure.set/union
-             w (count (first m))
-             g (group-by
-                (fn [r]
-                  (count (filter #(#{'A 'B 'C 'D} %) r)))
-                m)
+       (let [w (count (first m))
+             g (group-by (fn [r]
+                           (count (filter #(#{'A 'B 'C 'D} %) r))) m)
              pv (for [i (range w) j (g i) k (g (inc i))
                       :when (contains?
                              #{#{'A 'a}, #{'B 'b}, #{'C 'c}, #{'D 'd}}
-                             (sd (su j k) (si j k)))]
-                  [#{j k} (si j k)])
+                             (clojure.set/difference
+                              (clojure.set/union j k)
+                              (clojure.set/intersection j k)))]
+                  [#{j k} (clojure.set/intersection j k)])
              p2 (set (map last pv))]
          (if (empty? p2)
            (minimize-primes minterms m #{})
-           (recur (su (sd m (apply su (map first pv))) p2)))))))
+           (recur (clojure.set/union
+                   (clojure.set/difference
+                    m
+                    (apply clojure.set/union (map first pv)))
+                   p2)))))))
   )
