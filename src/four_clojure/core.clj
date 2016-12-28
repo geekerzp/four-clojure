@@ -1323,16 +1323,14 @@ Class
                                         (inc (min x (- (count (first vs)) s))))]
                      (map #(cons (take s (drop off-set (first vs))) %)
                           (squares (rest vs) x s (dec t)))))))]
-        (->>
-         (for [order (reverse (drop 2 (range (inc order))))]
-           [order (->>
-                   (for [x (range (inc (- column order)))
-                         y (range (inc (- row order)))]
-                     (squares (drop y vs) x order order))
-                   (apply concat)
-                   distinct
-                   (filter latin-square?)
-                   count)])
-         (filter #(pos? (second %)))
-         (into {})))))
+        (frequencies (map count (apply concat (map
+                                   #(->>
+                                     (for [x (range (inc (- column %)))
+                                           y (range (inc (- row %)))]
+                                       (squares (drop y vs) x % %))
+                                     (apply concat)
+                                     distinct
+                                     (filter latin-square?)
+                                     ) (reverse (drop 2 (range (inc order))))))))
+        )))
   )
