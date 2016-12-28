@@ -1277,23 +1277,98 @@ Class
                   (recur (remove #(covers? essential %) not-covered)
                          (disj primes essential)
                          (conj used-primes essential)))))]
-     (loop [m minterms]
-       (let [w (count (first m))
-             g (group-by (fn [r]
-                           (count (filter #(#{'A 'B 'C 'D} %) r))) m)
-             pv (for [i (range w) j (g i) k (g (inc i))
-                      :when (contains?
-                             #{#{'A 'a}, #{'B 'b}, #{'C 'c}, #{'D 'd}}
-                             (clojure.set/difference
-                              (clojure.set/union j k)
-                              (clojure.set/intersection j k)))]
-                  [#{j k} (clojure.set/intersection j k)])
-             p2 (set (map last pv))]
-         (if (empty? p2)
-           (minimize-primes minterms m #{})
-           (recur (clojure.set/union
-                   (clojure.set/difference
-                    m
-                    (apply clojure.set/union (map first pv)))
-                   p2)))))))
+      (loop [m minterms]
+        (let [w (count (first m))
+              g (group-by (fn [r]
+                            (count (filter #(#{'A 'B 'C 'D} %) r))) m)
+              pv (for [i (range w) j (g i) k (g (inc i))
+                       :when (contains?
+                              #{#{'A 'a}, #{'B 'b}, #{'C 'c}, #{'D 'd}}
+                              (clojure.set/difference
+                               (clojure.set/union j k)
+                               (clojure.set/intersection j k)))]
+                   [#{j k} (clojure.set/intersection j k)])
+              p2 (set (map last pv))]
+          (if (empty? p2)
+            (minimize-primes minterms m #{})
+            (recur (clojure.set/union
+                    (clojure.set/difference
+                     m
+                     (apply clojure.set/union (map first pv)))
+                    p2)))))))
   )
+
+;; Latin Square Slicing
+;; http://www.4clojure.com/problem/152
+(def latin-square-slicing
+  (fn [matrix]
+    (let [m (count matrix)
+          n (apply max (map count matrix))]
+      (letfn [(latin-square?
+                [rows]
+                (if (empty? rows)
+                  false
+                  (let [columns (apply (partial map vector) rows)]
+                    (and (not (some nil? (flatten rows)))
+                         (apply = (map set rows))
+                         (apply = (map set columns))
+                         (= (count rows) (count (set rows)))
+                         (= (count columns) (count (set columns)))))))
+              (sub-matrix
+                [matrix i j size]
+                (map #(subvec (matrix %) j (+ j size)) (range i (+ i size))))
+              (sub-matrices
+                [matrix size]
+                (let [n (count (first matrix))]
+                  (filter #(not (empty? %))
+                          (apply concat
+                                 (map-indexed
+                                  (fn [i row]
+                                    (map-indexed
+                                     (fn [j itm]
+                                       (if (and
+                                            (<= size (- m i))
+                                            (<= size (- (count (matrix i)) j)))
+                                         (sub-matrix matrix i j size)))
+                                     row))
+                                  matrix)))))
+              (all-sub-matrices
+                [matrix]
+                (mapcat (fn [size]
+                          (mapcat #(sub-matrices % size) (matrices matrix)))
+                        (range 2 (inc m))))
+              (cartesian-product
+                [s]
+                (reduce (fn [c1 c2]
+                          (mapcat (fn [c] (mapv #(conj c %) c2)) c1))
+                        (map vector (first s))
+                        (rest s)))
+              (matrices
+                [matrix]
+                (if (apply = (map count matrix))
+                  (list matrix)
+                  (let [offset-list (cartesian-product
+                                     (mapv #(if (not= n (count %))
+                                              (vec (range (inc (- n (count %)))))
+                                              (vector 0))
+                                           matrix))
+                        apply-offset (fn [matrix offset-list]
+                                       (map-indexed
+                                        (fn [i row]
+                                          (if (= n (count row))
+                                            row
+                                            (vec
+                                             (take n (concat
+                                                      (repeat (offset-list i) nil)
+                                                      row
+                                                      (repeat nil))))))
+                                        matrix))]
+                    (map vec
+                         (mapv
+                          (partial apply-offset matrix)
+                          offset-list)))))]
+        (->>  (all-sub-matrices matrix)
+              (distinct)
+              (filter latin-square?)
+              (map count)
+              (frequencies))))))
