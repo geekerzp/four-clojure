@@ -1321,15 +1321,15 @@ Class
                              (map #(cons (take s (drop xx (first vs))) %)
                                   (squares (rest vs) x s (dec t)))))))  ]
         (->>
-         (for [s (reverse (drop 2 (range (inc r))))]
-           [s (->>
-               (for [x (range (inc (- m s)))
-                     y (range (inc (- (count vs) s)))]
-                 (squares (drop y vs) x s s))
-               (apply concat)
-               distinct
-               (filter latin-square?)
-               count)])
+         (for [order (reverse (drop 2 (range (inc r))))]
+           [order (->>
+                   (for [x (range (inc (- m order)))
+                         y (range (inc (- (count vs) order)))]
+                     (squares (drop y vs) x order order))
+                   (apply concat)
+                   distinct
+                   (filter latin-square?)
+                   count)])
          (filter #(pos? (second %)))
          (into {})))))
   )
