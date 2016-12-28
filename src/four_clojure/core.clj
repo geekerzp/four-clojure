@@ -1319,9 +1319,9 @@ Class
                   '(())
                   (apply
                    concat
-                   (for [xx (range (max 0 (- x (- column (count (first vs)))))
-                                   (inc (min x (- (count (first vs)) s))))]
-                     (map #(cons (take s (drop xx (first vs))) %)
+                   (for [off-set (range (max 0 (- x (- column (count (first vs)))))
+                                        (inc (min x (- (count (first vs)) s))))]
+                     (map #(cons (take s (drop off-set (first vs))) %)
                           (squares (rest vs) x s (dec t)))))))]
         (->>
          (for [order (reverse (drop 2 (range (inc order))))]
