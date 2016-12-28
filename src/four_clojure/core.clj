@@ -1305,15 +1305,15 @@ Class
     (let [column (apply max (map count vs))
           row (count vs)
           order (min row column)]
-      (letfn [(latin-square1? [vs]
-                (let [h (first vs)]
-                  (and (not (nil? h))
-                       (empty? (filter #(.contains % nil) vs))
-                       (= (count h) (count (distinct h)))
-                       (apply = (map #(sort (distinct %)) vs)))))
+      (letfn [(rotate [vs]
+                (apply map list vs))
+              (latin? [vs]
+                (and (not-empty vs)
+                     (empty? (filter #(.contains % nil) vs))
+                     (= (count (first vs)) (count (distinct (first vs))))
+                     (apply = (map #(sort (distinct %)) vs))))
               (latin-square? [vs]
-                (and (latin-square1? vs)
-                     (latin-square1? (apply map list vs))))
+                (and (latin? vs) (latin? (rotate vs))))
               (squares [vs x s t]
                 (if (zero? t)
                   '(())
