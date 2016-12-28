@@ -1301,78 +1301,34 @@ Class
 ;; Latin Square Slicing
 ;; http://www.4clojure.com/problem/152
 (def latin-square-slicing
-  (fn [matrix]
-    (let [m (count matrix)
-          n (apply max (map count matrix))]
-      (letfn [(latin-square?
-                [rows]
-                (if (empty? rows)
-                  false
-                  (let [columns (apply (partial map vector) rows)]
-                    (and (not (some nil? (flatten rows)))
-                         (apply = (map set rows))
-                         (apply = (map set columns))
-                         (= (count rows) (count (set rows)))
-                         (= (count columns) (count (set columns)))))))
-              (sub-matrix
-                [matrix i j size]
-                (map #(subvec (matrix %) j (+ j size)) (range i (+ i size))))
-              (sub-matrices
-                [matrix size]
-                (let [n (count (first matrix))]
-                  (filter
-                   #(not (empty? %))
-                   (apply concat
-                          (map-indexed
-                           (fn [i row]
-                             (map-indexed
-                              (fn [j itm]
-                                (if (and
-                                     (<= size (- m i))
-                                     (<= size (- (count (matrix i)) j)))
-                                  (sub-matrix matrix i j size)))
-                              row))
-                           matrix)))))
-              (all-sub-matrices
-                [matrix]
-                (mapcat (fn [size]
-                          (mapcat #(sub-matrices % size) (matrices matrix)))
-                        (range 2 (inc m))))
-              (cartesian-product
-                [s]
-                (reduce (fn [c1 c2]
-                          (mapcat (fn [c] (mapv #(conj c %) c2)) c1))
-                        (map vector (first s))
-                        (rest s)))
-              (matrices
-                [matrix]
-                (if (apply = (map count matrix))
-                  (list matrix)
-                  (let [offset-list
-                        (cartesian-product
-                         (mapv #(if (not= n (count %))
-                                  (vec (range (inc (- n (count %)))))
-                                  (vector 0))
-                               matrix))
-
-                        apply-offset
-                        (fn [matrix offset-list]
-                          (map-indexed
-                           (fn [i row]
-                             (if (= n (count row))
-                               row
-                               (vec
-                                (take n (concat
-                                         (repeat (offset-list i) nil)
-                                         row
-                                         (repeat nil))))))
-                           matrix))]
-                    (map vec
-                         (mapv
-                          (partial apply-offset matrix)
-                          offset-list)))))]
-        (->>  (all-sub-matrices matrix)
-              (distinct)
-              (filter latin-square?)
-              (map count)
-              (frequencies))))))
+  (fn [vs]
+    (let [m (apply max (map count vs))
+          r (min (count vs) m) ]
+      (letfn [(latin-square1? [vs]
+                (let [h (first vs)]
+                  (and (not (nil? h))
+                       (empty? (filter #(.contains % nil) vs))
+                       (= (count h) (count (distinct h)))
+                       (apply = (map #(sort (distinct %)) vs)))))
+              (latin-square? [vs]
+                (and (latin-square1? vs)
+                     (latin-square1? (apply map list vs))))
+              (squares [vs x s t]
+                (if (zero? t) '(())
+                    (apply concat
+                           (for [xx (range (max 0 (- x (- m (count (first vs)))))
+                                           (inc (min x (- (count (first vs)) s))))]
+                             (map #(cons (take s (drop xx (first vs))) %)
+                                  (squares (rest vs) x s (dec t)))))))  ]
+        (->>
+         (for [s (reverse (drop 2 (range (inc r))))]
+           [s (->>
+               (for [x (range (inc (- m s)))
+                     y (range (inc (- (count vs) s)))]
+                 (squares (drop y vs) x s s))
+               (apply concat)
+               distinct
+               (filter latin-square?)
+               count)])
+         (filter #(pos? (second %)))
+         (into {}))))))
