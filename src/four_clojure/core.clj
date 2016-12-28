@@ -1302,8 +1302,9 @@ Class
 ;; http://www.4clojure.com/problem/152
 (def latin-square-slicing
   (fn [vs]
-    (let [m (apply max (map count vs))
-          r (min (count vs) m) ]
+    (let [column (apply max (map count vs))
+          row (count vs)
+          order (min row column)]
       (letfn [(latin-square1? [vs]
                 (let [h (first vs)]
                   (and (not (nil? h))
@@ -1314,17 +1315,19 @@ Class
                 (and (latin-square1? vs)
                      (latin-square1? (apply map list vs))))
               (squares [vs x s t]
-                (if (zero? t) '(())
-                    (apply concat
-                           (for [xx (range (max 0 (- x (- m (count (first vs)))))
-                                           (inc (min x (- (count (first vs)) s))))]
-                             (map #(cons (take s (drop xx (first vs))) %)
-                                  (squares (rest vs) x s (dec t)))))))  ]
+                (if (zero? t)
+                  '(())
+                  (apply
+                   concat
+                   (for [xx (range (max 0 (- x (- column (count (first vs)))))
+                                   (inc (min x (- (count (first vs)) s))))]
+                     (map #(cons (take s (drop xx (first vs))) %)
+                          (squares (rest vs) x s (dec t)))))))]
         (->>
-         (for [order (reverse (drop 2 (range (inc r))))]
+         (for [order (reverse (drop 2 (range (inc order))))]
            [order (->>
-                   (for [x (range (inc (- m order)))
-                         y (range (inc (- (count vs) order)))]
+                   (for [x (range (inc (- column order)))
+                         y (range (inc (- row order)))]
                      (squares (drop y vs) x order order))
                    (apply concat)
                    distinct
