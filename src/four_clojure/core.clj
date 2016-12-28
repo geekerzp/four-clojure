@@ -1317,20 +1317,21 @@ Class
               (squares [vs x s t]
                 (if (zero? t)
                   '(())
-                  (apply
-                   concat
-                   (for [off-set (range (max 0 (- x (- column (count (first vs)))))
-                                        (inc (min x (- (count (first vs)) s))))]
-                     (map #(cons (take s (drop off-set (first vs))) %)
-                          (squares (rest vs) x s (dec t)))))))]
-        (frequencies (map count (apply concat (map
-                                   #(->>
-                                     (for [x (range (inc (- column %)))
-                                           y (range (inc (- row %)))]
-                                       (squares (drop y vs) x % %))
-                                     (apply concat)
-                                     distinct
-                                     (filter latin-square?)
-                                     ) (reverse (drop 2 (range (inc order))))))))
+                  (apply concat
+                         (for [off-set (range (max 0 (- x (- column (count (first vs)))))
+                                              (inc (min x (- (count (first vs)) s))))]
+                           (map #(cons (take s (drop off-set (first vs))) %)
+                                (squares (rest vs) x s (dec t)))))))
+              (latin-squares [order]
+                (->> (for [x (range (inc (- column order)))
+                           y (range (inc (- row order)))]
+                       (squares (drop y vs) x order order))
+                     (apply concat)
+                     distinct
+                     (filter latin-square?)))]
+        (->> (map #(latin-squares %) (reverse (drop 2 (range (inc order)))))
+             (apply concat)
+             (map count)
+             frequencies)
         )))
   )
