@@ -1320,18 +1320,19 @@ Class
               (sub-matrices
                 [matrix size]
                 (let [n (count (first matrix))]
-                  (filter #(not (empty? %))
-                          (apply concat
-                                 (map-indexed
-                                  (fn [i row]
-                                    (map-indexed
-                                     (fn [j itm]
-                                       (if (and
-                                            (<= size (- m i))
-                                            (<= size (- (count (matrix i)) j)))
-                                         (sub-matrix matrix i j size)))
-                                     row))
-                                  matrix)))))
+                  (filter
+                   #(not (empty? %))
+                   (apply concat
+                          (map-indexed
+                           (fn [i row]
+                             (map-indexed
+                              (fn [j itm]
+                                (if (and
+                                     (<= size (- m i))
+                                     (<= size (- (count (matrix i)) j)))
+                                  (sub-matrix matrix i j size)))
+                              row))
+                           matrix)))))
               (all-sub-matrices
                 [matrix]
                 (mapcat (fn [size]
