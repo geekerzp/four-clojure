@@ -1348,22 +1348,25 @@ Class
                 [matrix]
                 (if (apply = (map count matrix))
                   (list matrix)
-                  (let [offset-list (cartesian-product
-                                     (mapv #(if (not= n (count %))
-                                              (vec (range (inc (- n (count %)))))
-                                              (vector 0))
-                                           matrix))
-                        apply-offset (fn [matrix offset-list]
-                                       (map-indexed
-                                        (fn [i row]
-                                          (if (= n (count row))
-                                            row
-                                            (vec
-                                             (take n (concat
-                                                      (repeat (offset-list i) nil)
-                                                      row
-                                                      (repeat nil))))))
-                                        matrix))]
+                  (let [offset-list
+                        (cartesian-product
+                         (mapv #(if (not= n (count %))
+                                  (vec (range (inc (- n (count %)))))
+                                  (vector 0))
+                               matrix))
+
+                        apply-offset
+                        (fn [matrix offset-list]
+                          (map-indexed
+                           (fn [i row]
+                             (if (= n (count row))
+                               row
+                               (vec
+                                (take n (concat
+                                         (repeat (offset-list i) nil)
+                                         row
+                                         (repeat nil))))))
+                           matrix))]
                     (map vec
                          (mapv
                           (partial apply-offset matrix)
