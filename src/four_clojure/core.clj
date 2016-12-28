@@ -1331,4 +1331,5 @@ Class
                (filter latin-square?)
                count)])
          (filter #(pos? (second %)))
-         (into {}))))))
+         (into {})))))
+  )
